@@ -4,7 +4,7 @@
 
 
 <p>
-This styleguide is derived from the <a href="http://code.google.com/p/google-styleguide/">Google C++ Style Guide</a> an is hosted on <a href="https://github.com/ufz/styleguide">Github</a>. Some modifications were made to match the <a href="http://www.opengeosys.net" target="blank">OpenGeoSys</a> development needs. The original authors are listed on the right side.
+This styleguide is derived from the <a href="http://code.google.com/p/google-styleguide/">Google C++ Style Guide</a> an is hosted on <a href="https://github.com/ufz/styleguide">Github</a>. Some <a href="https://github.com/ufz/styleguide/compare/9df0dce4fa1441f9de7ff99760c61e01b6d3b79c...gh-pages">modifications</a> were made to match the <a href="http://www.opengeosys.net" target="blank">OpenGeoSys</a> development needs. The original authors are listed on the right side.
 </p>
 
 <p align="right">
