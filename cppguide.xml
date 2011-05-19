@@ -1,6 +1,11 @@
 <?xml version="1.0"?>
 <?xml-stylesheet type="text/xsl" href="styleguide.xsl"?>
-<GUIDE title="Google C++ Style Guide">
+<GUIDE title="OpenGeoSys C++ Style Guide">
+
+
+<p>
+This styleguide is derived from the <a href="http://code.google.com/p/google-styleguide/">Google C++ Style Guide</a> an is hosted on <a href="https://github.com/ufz/styleguide">Github</a>. Some modifications were made to match the <a href="http://www.opengeosys.net" target="blank">OpenGeoSys</a> development needs. The original authors are listed on the right side.
+</p>
 
 <p align="right">
 
@@ -102,7 +107,7 @@ Tashana Landray
 
 <CATEGORY title="Header Files">
   <p>
-    In general, every <code>.cc</code> file should have an associated
+    In general, every <code>.cpp</code> file should have an associated
     <code>.h</code> file. There are some common exceptions, such as
     
     unittests
@@ -123,23 +128,23 @@ Tashana Landray
       All header files should have <code>#define</code> guards to
       prevent multiple inclusion.  The format of the symbol name
       should be
-      <code><i>&lt;PROJECT&gt;</i>_<i>&lt;PATH&gt;</i>_<i>&lt;FILE&gt;</i>_H_</code>.
+      <code><i>&lt;FILE&gt;</i>_HEADER</code>.
     </SUMMARY>
     <BODY>
       
       <p>
-        To guarantee uniqueness, they should be based on the full path
-        in a project's source tree.  For example, the file
-        <code>foo/src/bar/baz.h</code> in project <code>foo</code> should
+        Every file in a project should be named unique so it is
+        sufficient to only user the filename. For example, the file
+        <code>foo.h</code> should
         have the following guard:
       </p>
       <CODE_SNIPPET>
-         #ifndef FOO_BAR_BAZ_H_
-         #define FOO_BAR_BAZ_H_
+         #ifndef FOO_HEADER
+         #define FOO_HEADER
 
          ...
 
-         #endif  // FOO_BAR_BAZ_H_
+         #endif  // FOO_HEADER
       </CODE_SNIPPET>
       
     </BODY>
@@ -275,6 +280,7 @@ Tashana Landray
     </BODY>
   </STYLEPOINT>
 
+  <!-- inadvisable 
   <STYLEPOINT title="The -inl.h Files">
     <SUMMARY>
       You may use file names with a <code>-inl.h</code> suffix to define
@@ -315,6 +321,7 @@ Tashana Landray
       
     </BODY>
   </STYLEPOINT>
+  -->
 
   <STYLEPOINT title="Function Parameter Ordering">
     <SUMMARY>
@@ -680,8 +687,7 @@ Tashana Landray
   <STYLEPOINT title="Nonmember, Static Member, and Global Functions">
     <SUMMARY>
       Prefer nonmember functions within a namespace or static member
-      functions to global functions; use completely global functions
-      rarely.
+      functions to global functions; never use completely global functions.
     </SUMMARY>
     <BODY>
       <PROS>
@@ -715,7 +721,7 @@ Tashana Landray
         </p>
         <p>
           If you must define a nonmember function and it is only
-          needed in its <code>.cc</code> file, use an unnamed
+          needed in its <code>.cpp</code> file, use an unnamed
           <a HREF="#Namespaces">namespace</a> or <code>static</code>
           linkage (eg <code>static int Foo() {...}</code>) to limit
           its scope.
@@ -1349,23 +1355,38 @@ Tashana Landray
   <STYLEPOINT title="Access Control">
     <SUMMARY>
       Make data members <code>private</code>, and provide
-      access to them through accessor functions as needed (for
-      technical reasons, we allow data members of a test fixture class
-      to be <code>protected</code> when using
-      
-      <A HREF="http://code.google.com/p/googletest/">
-      Google Test</A>). Typically a variable would be
-      called <code>foo_</code> and the accessor function
-      <code>foo()</code>.  You may also want a mutator function
-      <code>set_foo()</code>.
-      Exception: <code>static const</code> data members (typically
-      called <code>kFoo</code>) need not be <code>private</code>.
+      access to them through accessor functions as needed.
+      Typically a variable would be
+      called <code>_foo</code> and the accessor function
+      <code>getFoo()</code>.  You may also want a mutator function
+      <code>setFoo()</code>.
     </SUMMARY>
     <BODY>
+      <p>
+        Exception: <code>static const</code> data members need not be <code>private</code>.
+      </p>
       <p>
         The definitions of accessors are usually inlined in the header
         file.
       </p>
+      <BAD_CODE_SNIPPET>
+        class Bar
+        {
+          public:
+            int foo;
+        }
+      </BAD_CODE_SNIPPET>
+      <CODE_SNIPPET>
+        class Bar
+        {
+          public:
+            int getFoo() const { return _foo; }
+            void setFoo(const int value) { _foo = value; }
+          
+          private:
+            int _foo;
+        }
+      </CODE_SNIPPET>
       <p>
         See also <a HREF="#Inheritance">Inheritance</a> and <a HREF="#Function_Names">Function Names</a>.
       </p>
@@ -2746,27 +2767,22 @@ Tashana Landray
 
   <STYLEPOINT title="File Names">
     <SUMMARY>
-      Filenames should be all lowercase and can include underscores
-      (<code>_</code>) or dashes (<code>-</code>).  Follow the
-      convention that your
-      
-      project
-      uses. If there is no consistent local pattern to follow, prefer "_".
+      Filenames should be camel case and do not include underscores
+      (<code>_</code>) or dashes (<code>-</code>). The name must match the
+      class that is defined in the file.
     </SUMMARY>
     <BODY>
       <p>
-        Examples of acceptable file names:
+        Examples of acceptable file names for the class <code>MyUsefulClass</code>:
       </p>
       <p>
         <code>
-          my_useful_class.cc<br/>
-          my-useful-class.cc<br/>
-          myusefulclass.cc<br/>
-          myusefulclass_test.cc  // _unittest and _regtest are deprecated.<br/>
+          MyUsefulClass.h<br/>
+          MyUsefulClass.cpp<br/>
         </code>
       </p>
       <p>
-        C++ files should end in <code>.cc</code> and header files
+        C++ files should end in <code>.cpp</code> and header files
         should end in <code>.h</code>.
       </p>
       <p>
@@ -2774,28 +2790,9 @@ Tashana Landray
         in <code>/usr/include</code>, such as <code>db.h</code>.
       </p>
       <p>
-        In general, make your filenames very specific.  For example,
-        use <code>http_server_logs.h</code> rather
-        than <code>logs.h</code>.  A very common case is to have a
-        pair of files called, e.g., <code>foo_bar.h</code>
-        and <code>foo_bar.cc</code>, defining a class
-        called <code>FooBar</code>.
-      </p>
-      <p>
         Inline functions must be in a <code>.h</code> file. If your
         inline functions are very short, they should go directly into your
-        <code>.h</code> file. However, if your inline functions
-        include a lot of code, they may go into a third file that
-        ends in <code>-inl.h</code>.  In a class with a lot of inline
-        code, your class could have three files:
-      </p>
-      <CODE_SNIPPET>
-        url_table.h      // The class declaration.
-        url_table.cc     // The class definition.
-        url_table-inl.h  // Inline functions that include lots of code.
-      </CODE_SNIPPET>
-      <p>
-        See also the section <a href="#The_-inl.h_Files">-inl.h Files</a>
+        <code>.h</code> file.
       </p>
     </BODY>
   </STYLEPOINT>
@@ -2830,12 +2827,13 @@ Tashana Landray
 
   <STYLEPOINT title="Variable Names">
     <SUMMARY>
-      Variable names are all lowercase, with underscores between
-      words.  Class member variables have trailing underscores.  For
-      instance: <code>my_exciting_local_variable</code>,
-      <code>my_exciting_member_variable_</code>.
+      Variable names start lowercase and then camel case. Class member
+      variables start with an underscore.  For
+      instance: <code>int myExcitingLocalVariable</code>,
+      <code>_myExcitingMemberVariable</code>.
     </SUMMARY>
     <BODY>
+      <!--
       <SUBSECTION title="Common Variable names">
         <p>
           For example:
@@ -2861,17 +2859,18 @@ Tashana Landray
           string tablename_;   // OK.
         </CODE_SNIPPET>
       </SUBSECTION>
+      -->
 
       <SUBSECTION title="Struct Variables">
         <p>
           Data members in structs should be named like regular
-          variables without the trailing underscores that data members
+          variables without the starting underscore that data members
           in classes have.
         </p>
         <CODE_SNIPPET>
           struct UrlTableProperties {
             string name;
-            int num_entries;
+            int numEntries;
           }
         </CODE_SNIPPET>
         <p>
@@ -2880,6 +2879,7 @@ Tashana Landray
         </p>
       </SUBSECTION>
 
+      <!--
       <SUBSECTION title="Global Variables">
         <p>
           There are no special requirements for global variables,
@@ -2888,9 +2888,11 @@ Tashana Landray
           marker to easily distinguish it from local variables.
         </p>
       </SUBSECTION>
+      -->
     </BODY>
   </STYLEPOINT>
 
+  <!--
   <STYLEPOINT title="Constant Names">
     <SUMMARY>
       Use a <code>k</code> followed by mixed case:
@@ -2908,31 +2910,26 @@ Tashana Landray
       </CODE_SNIPPET>
     </BODY>
   </STYLEPOINT>
+  -->
 
   <STYLEPOINT title="Function Names">
     <SUMMARY>
-      Regular functions have mixed case; accessors and mutators match
-      the name of the variable: <code>MyExcitingFunction()</code>,
-      <code>MyExcitingMethod()</code>,
-      <code>my_exciting_member_variable()</code>,
-      <code>set_my_exciting_member_variable()</code>.
+      Function names should represent an action. Regular functions start
+      lowercase an then camel case. Accessors and mutators match
+      the name of the variable with a "get" or "set" prefix: <code>doSomeStuff()</code>,
+      <code>doSomeStuffOnThing()</code>,
+      <code>getMyExcitingMemberVariable()</code>,
+      <code>setMyExcitingMemberVariable()</code>.
     </SUMMARY>
     <BODY>
       <SUBSECTION title="Regular Functions">
         <p>
-          Functions should start with a capital letter and have a
+          Functions should start with a lowercase letter and have a
           capital letter for each new word. No underscores.
         </p>
-        <p>
-          If your function crashes upon an error, you should append OrDie to
-          the function name. This only applies to functions which could be
-          used by production code and to errors that are reasonably
-          likely to occur during normal operation.
-        </p>
         <CODE_SNIPPET>
-          AddTableEntry()
-          DeleteUrl()
-          OpenFileOrDie()
+          addTableEntry()
+          deleteUrl()
         </CODE_SNIPPET>
       </SUBSECTION>
 
@@ -2941,25 +2938,27 @@ Tashana Landray
           Accessors and mutators (get and set functions) should match
           the name of the variable they are getting and setting.  This
           shows an excerpt of a class whose instance variable is
-          <code>num_entries_</code>.
+          <code>_numEntries</code>.
         </p>
         <CODE_SNIPPET>
           class MyClass {
            public:
             ...
-            int num_entries() const { return num_entries_; }
-            void set_num_entries(int num_entries) { num_entries_ = num_entries; }
+            int getNumEntries() const { return _numEntries_; }
+            void setNumEntries(int numEntries) { _numEntries = numEntries; }
 
            private:
-            int num_entries_;
+            int _numEntries;
           };
         </CODE_SNIPPET>
+        <!--
         <p>
           You may also use lowercase letters for other very short
           inlined functions. For example if a function were so cheap
           you would not cache the value if you were calling it in a
           loop, then lowercase naming would be acceptable.
         </p>
+        -->
       </SUBSECTION>
     </BODY>
   </STYLEPOINT>
