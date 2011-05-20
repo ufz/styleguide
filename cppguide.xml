@@ -2430,6 +2430,12 @@ Tashana Landray
       <p>
         K&amp;R style is more compact but lacks some clearness.
       </p>
+      <CODE_SNIPPET>
+        if (x == y) {
+            doSomething();
+            doSomethingElse();
+        }
+      </CODE_SNIPPET>
     </BODY>
   </STYLEPOINT>
 
