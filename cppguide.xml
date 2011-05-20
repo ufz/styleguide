@@ -109,10 +109,8 @@ Tashana Landray
   <p>
     In general, every <code>.cpp</code> file should have an associated
     <code>.h</code> file. There are some common exceptions, such as
-    
-    unittests
-    and small <code>.cpp</code> files containing just a <code>main()</code>
-    function.
+    unittests and small <code>.cpp</code> files containing just a
+    <code>main()</code> function. There is only one class per header file.
   </p>
   <p>
     Correct use of header files can make a huge difference to the
@@ -128,23 +126,23 @@ Tashana Landray
       All header files should have <code>#define</code> guards to
       prevent multiple inclusion.  The format of the symbol name
       should be
-      <code><i>&lt;FILE&gt;</i>_HEADER</code>.
+      <code><i>&lt;FILENAME_WITHOUT_ENDING&gt;</i>_H</code>.
     </SUMMARY>
     <BODY>
       
       <p>
         Every file in a project should be named unique so it is
         sufficient to only user the filename. For example, the file
-        <code>foo.h</code> should
+        <code>Foo.h</code> should
         have the following guard:
       </p>
       <CODE_SNIPPET>
-         #ifndef FOO_HEADER
-         #define FOO_HEADER
+         #ifndef FOO_H
+         #define FOO_H
 
          ...
 
-         #endif  // FOO_HEADER
+         #endif  // FOO_H
       </CODE_SNIPPET>
       
     </BODY>
@@ -169,11 +167,21 @@ Tashana Landray
         You can significantly reduce the number of header files you
         need to include in your own header files by using forward
         declarations.  For example, if your header file uses the
-        <code>File</code> class in ways that do not require access to
-        the declaration of the <code>File</code> class, your header
-        file can just forward declare <code>class File;</code> instead
-        of having to <code>#include "file/base/file.h"</code>.
+        <code>MyClass</code> class in ways that do not require access to
+        the declaration of the <code>MyClass</code> class, your header
+        file can just forward declare <code>class MyClass;</code> instead
+        of having to <code>#include "MyClass.h"</code>. Note the special
+        notation of classes inside namespaces.
       </p>
+      <CODE_SNIPPET> 
+        class MyClass;                      // Forward declaration
+        namespace MyNamespace { class A; }  // Forward declaration of MyNamespace::A
+      </CODE_SNIPPET>
+      <p>instead of</p>
+      <BAD_CODE_SNIPPET>
+        include "MyClass.h" // Bad include
+        include "A.h"       // Bad include
+      </BAD_CODE_SNIPPET>
       <p>
         How can we use a class <code>Foo</code> in a header file
         without access to its definition?
@@ -202,14 +210,6 @@ Tashana Landray
         has a data member of type <code>Foo</code>.
       </p>
       <p>
-        Sometimes it makes sense to have pointer (or better,
-        <code>scoped_ptr</code>)
-        members instead of object members. However, this complicates code
-        readability and imposes a performance penalty, so avoid doing
-        this transformation if the only purpose is to minimize includes
-        in header files.
-      </p>
-      <p>
         Of course, <code>.cpp</code> files typically do require the
         definitions of the classes they use, and usually have to
         include several header files.
@@ -220,18 +220,14 @@ Tashana Landray
         should bring in a definition for <code>Foo</code> yourself,
         either via an #include or via a forward declaration.  Do not
         depend on the symbol being brought in transitively via headers
-        not directly included.  One exception is if <code>Foo</code>
-        is used in <code>myfile.cpp</code>, it's ok to #include (or
-        forward-declare) <code>Foo</code> in <code>myfile.h</code>,
-        instead of <code>myfile.cpp</code>.
+        not directly included.
       </SUBSECTION>
     </BODY>
   </STYLEPOINT>
 
   <STYLEPOINT title="Inline Functions">
     <SUMMARY>
-      Define functions inline only when they are small, say, 10 lines
-      or less.
+      Define functions inline only when they are small, say, 1-2 lines.
     </SUMMARY>
     <BODY>
       <DEFINITION>
@@ -279,49 +275,6 @@ Tashana Landray
       </DECISION>
     </BODY>
   </STYLEPOINT>
-
-  <!-- inadvisable 
-  <STYLEPOINT title="The -inl.h Files">
-    <SUMMARY>
-      You may use file names with a <code>-inl.h</code> suffix to define
-      complex inline functions when needed.
-    </SUMMARY>
-    <BODY>
-      <p>
-        The definition of an inline function needs to be in a header
-        file, so that the compiler has the definition available for
-        inlining at the call sites.  However, implementation code
-        properly belongs in <code>.cpp</code> files, and we do not like
-        to have much actual code in <code>.h</code> files unless there
-        is a readability or performance advantage.
-      </p>
-      <p>
-        If an inline function definition is short, with very little,
-        if any, logic in it, you should put the code in your
-        <code>.h</code> file.  For example, accessors and mutators
-        should certainly be inside a class definition.  More complex
-        inline functions may also be put in a <code>.h</code> file for
-        the convenience of the implementer and callers, though if this
-        makes the <code>.h</code> file too unwieldy you can instead
-        put that code in a separate <code>-inl.h</code> file.
-        This separates the implementation from the class definition,
-        while still allowing the implementation to be included where
-        necessary.
-      </p>
-      <p>
-        Another use of <code>-inl.h</code> files is for definitions of
-        function templates.  This can be used to keep your template
-        definitions easy to read.
-      </p>
-      <p>
-        Do not forget that a <code>-inl.h</code> file requires a
-        <a href="#The__define_Guard"><code>#define</code> guard</a> just
-        like any other header file.
-      </p>
-      
-    </BODY>
-  </STYLEPOINT>
-  -->
 
   <STYLEPOINT title="Function Parameter Ordering">
     <SUMMARY>
@@ -421,11 +374,9 @@ Tashana Landray
 <CATEGORY title="Scoping">
   <STYLEPOINT title="Namespaces">
     <SUMMARY>
-      Unnamed namespaces in <code>.cpp</code> files are encouraged.  With
-      named namespaces, choose the name based on the
-      
-      project, and possibly its path.
-      Do not use a <SYNTAX>using-directive</SYNTAX>.
+      Choose the name of the namespace based on the project component
+      it belongs to.
+      Do not use a <SYNTAX>using-directive</SYNTAX> in header files.
     </SUMMARY>
     <BODY>
       <DEFINITION>
@@ -439,62 +390,11 @@ Tashana Landray
           addition to the (also hierarchical) name axis provided by
           classes.
         </p>
-        <p>
-          For example, if two different projects have a class
-          <code>Foo</code> in the global scope, these symbols may
-          collide at compile time or at runtime.  If each project
-          places their code in a namespace, <code>project1::Foo</code>
-          and <code>project2::Foo</code> are now distinct symbols that
-          do not collide.
-        </p>
       </PROS>
-      <CONS>
-        <p>
-          Namespaces can be confusing, because they provide an
-          additional (hierarchical) axis of naming, in addition to the
-          (also hierarchical) name axis provided by classes.
-        </p>
-        <p>
-          Use of unnamed spaces in header files can easily cause
-          violations of the C++ One Definition Rule (ODR).
-        </p>
-      </CONS>
       <DECISION>
         <p>
           Use namespaces according to the policy described below.
         </p>
-
-        <SUBSECTION title="Unnamed Namespaces">
-          <ul>
-            <li> Unnamed namespaces are allowed and even encouraged in
-                 <code>.cpp</code> files, to avoid runtime naming
-                 conflicts:
-                 <CODE_SNIPPET>
-                   namespace                           // This is in a .cpp file.
-                   {
-                   
-                   // The content of a namespace is not indented
-                   enum { kUnused, kEOF, kError };       // Commonly used tokens.
-                   bool AtEof() { return pos_ == kEOF; }  // Uses our namespace's EOF.
-
-                   }  // namespace
-                 </CODE_SNIPPET>
-
-                 <p>
-                   However, file-scope declarations that are
-                   associated with a particular class may be declared
-                   in that class as types, static data members or
-                   static member functions rather than as members of
-                   an unnamed namespace.  Terminate the unnamed
-                   namespace as shown, with a comment <code>//
-                   namespace</code>.
-                 </p>
-                 </li>
-            <li> Do not use unnamed namespaces in <code>.h</code>
-                 files.
-                 </li>
-          </ul>
-        </SUBSECTION>
 
         <SUBSECTION title="Named Namespaces">
           <p>
@@ -508,7 +408,7 @@ Tashana Landray
                  from other namespaces:
                  <CODE_SNIPPET>
                    // In the .h file
-                   namespace mynamespace
+                   namespace MyNamespace
                    {
 
                    // All declarations are within the namespace scope.
@@ -520,11 +420,11 @@ Tashana Landray
                      void foo();
                    };
 
-                   }  // namespace mynamespace
+                   }  // namespace MyNamespace
                  </CODE_SNIPPET>
                  <CODE_SNIPPET>
                    // In the .cpp file
-                   namespace mynamespace
+                   namespace MyNamespace
                    {
 
                    // Definition of functions is within scope of the namespace.
@@ -533,27 +433,7 @@ Tashana Landray
                      ...
                    }
 
-                   }  // namespace mynamespace
-                 </CODE_SNIPPET>
-                 <p>
-                   The typical <code>.cpp</code> file might have more
-                   complex detail, including the need to reference classes
-                   in other namespaces.
-                 </p>
-                 <CODE_SNIPPET>
-                   #include "a.h"
-
-                   DEFINE_bool(someflag, false, "dummy flag");
-
-                   class C;  // Forward declaration of class C in the global namespace.
-                   namespace a { class A; }  // Forward declaration of a::A.
-
-                   namespace b
-                   {
-
-                   ...code for b...         // Code goes against the left margin.
-
-                   }  // namespace b
+                   }  // namespace MyNamespace
                  </CODE_SNIPPET>
                  </li>
 
@@ -568,114 +448,16 @@ Tashana Landray
                  file.
                  </li>
 
-            <li> You may not use a <SYNTAX>using-directive</SYNTAX> to
-                 make all names from a namespace available.
-                 <BAD_CODE_SNIPPET>
-                   // Forbidden -- This pollutes the namespace.
-                   using namespace foo;
-                 </BAD_CODE_SNIPPET>
-                 </li>
-
             <li> You may use a <SYNTAX>using-declaration</SYNTAX>
                  anywhere in a <code>.cpp</code> file, and in functions,
                  methods or classes in <code>.h</code> files.
                  <CODE_SNIPPET>
                    // OK in .cpp files.
-                   // Must be in a function, method or class in .h files.
-                   using ::foo::bar;
+                   using Foo;
                  </CODE_SNIPPET>
-                 </li>
-
-            <li> Namespace aliases are allowed anywhere in a
-                 <code>.cpp</code> file, anywhere inside the named
-                 namespace that wraps an entire <code>.h</code> file,
-                 and in functions and methods.
-                 <CODE_SNIPPET>
-                   // Shorten access to some commonly used names in .cpp files.
-                   namespace fbz = ::foo::bar::baz;
-
-                   // Shorten access to some commonly used names (in a .h file).
-                   namespace librarian {
-                   // The following alias is available to all files including
-                   // this header (in namespace librarian):
-                   // alias names should therefore be chosen consistently
-                   // within a project.
-                   namespace pd_s = ::pipeline_diagnostics::sidetable;
-
-                   inline void my_inline_function()
-                   {
-                     // namespace alias local to a function (or method).
-                     namespace fbz = ::foo::bar::baz;
-                     ...
-                   }
-                   }  // namespace librarian
-                 </CODE_SNIPPET>
-                 <p>
-                 Note that an alias in a .h file is visible to everyone
-                 #including that file, so public headers (those available
-                 outside a project) and headers transitively #included by them,
-                 should avoid defining aliases, as part of the general
-                 goal of keeping public APIs as small as possible.
-                 </p>
                  </li>
           </ul>
-        </SUBSECTION>
-
-        
-
-        
-
-        
-      </DECISION>
-    </BODY>
-  </STYLEPOINT>
-
-  <STYLEPOINT title="Nested Classes">
-    <SUMMARY>
-      Although you may use public nested classes when they are part of
-      an interface, consider a <a HREF="#Namespaces">namespace</a> to
-      keep declarations out of the global scope.
-    </SUMMARY>
-    <BODY>
-      <DEFINITION>
-        A class can define another class within it; this is also
-        called a <SYNTAX>member class</SYNTAX>.
-        <CODE_SNIPPET>
-          class Foo
-          {
-
-          private:
-            // Bar is a member class, nested within Foo.
-            class Bar
-            {
-              ...
-            };
-
-          };
-        </CODE_SNIPPET>
-      </DEFINITION>
-      <PROS>
-        This is useful when the nested (or member) class is only used
-        by the enclosing class; making it a member puts it in the
-        enclosing class scope rather than polluting the outer scope
-        with the class name.  Nested classes can be forward declared
-        within the enclosing class and then defined in the
-        <code>.cpp</code> file to avoid including the nested class
-        definition in the enclosing class declaration, since the
-        nested class definition is usually only relevant to the
-        implementation.
-      </PROS>
-      <CONS>
-        Nested classes can be forward-declared only within the
-        definition of the enclosing class. Thus, any header file
-        manipulating a <code>Foo::Bar*</code> pointer will have to
-        include the full class declaration for <code>Foo</code>.
-      </CONS>
-      <DECISION>
-        Do not make nested classes public unless they are actually
-        part of the interface, e.g., a class that holds a set of
-        options for some method.
-        
+        </SUBSECTION>        
       </DECISION>
     </BODY>
   </STYLEPOINT>
@@ -784,16 +566,24 @@ Tashana Landray
       </CODE_SNIPPET>
     </BODY>
   </STYLEPOINT>
-
-  <STYLEPOINT title="Static and Global Variables">
+  
+  <STYLEPOINT title="Global variables">
     <SUMMARY>
-      Static or global variables of class type are forbidden: they cause
+      NEVER use global variables! Period.
+    </SUMMARY>
+    <BODY>
+    </BODY>
+  </STYLEPOINT>
+
+  <STYLEPOINT title="Static Variables">
+    <SUMMARY>
+      Static variables of class type are forbidden: they cause
       hard-to-find bugs due to indeterminate order of construction and
       destruction.
     </SUMMARY>
     <BODY>
       <p>
-        Objects with static storage duration, including global variables,
+        Objects with static storage duration, including
         static variables, static class member variables, and function static
         variables, must be Plain Old Data (POD): only ints, chars, floats, or
         pointers, or arrays/structs of POD.
@@ -824,7 +614,7 @@ Tashana Landray
       </p>
       
       <p>
-        If you need a static or global variable of a class type, consider
+        If you need a static variable of a class type, consider
         initializing a pointer (which will never be freed), from either your
         main() function or from pthread_once().  Note that this must be a raw
         pointer, not a "smart" pointer, since the smart pointer's destructor
@@ -845,7 +635,7 @@ Tashana Landray
     <SUMMARY>
       In general, constructors should merely set member variables to their
       initial values.  Any complex initialization should go in an explicit
-      <code>Init()</code> method.
+      <code>init()</code> method.
     </SUMMARY>
     <BODY>
       <DEFINITION>
@@ -886,7 +676,7 @@ Tashana Landray
       </CONS>
       <DECISION>
         If your object requires non-trivial initialization, consider
-        having an explicit <code>Init()</code> method.  In particular,
+        having an explicit <code>init()</code> method.  In particular,
         constructors should not call virtual functions, attempt to raise
         errors, access potentially uninitialized global variables, etc.
       </DECISION>
@@ -932,51 +722,6 @@ Tashana Landray
           new member variables, you are not required to have a default
           constructor.
           
-        </p>
-      </DECISION>
-    </BODY>
-  </STYLEPOINT>
-
-  <STYLEPOINT title="Explicit Constructors">
-    <SUMMARY>
-      Use the C++ keyword <code>explicit</code> for constructors with
-      one argument.
-    </SUMMARY>
-    <BODY>
-      <DEFINITION>
-        Normally, if a constructor takes one argument, it can be used
-        as a conversion.  For instance, if you define
-        <code>Foo::Foo(string name)</code> and then pass a string to a
-        function that expects a <code>Foo</code>, the constructor will
-        be called to convert the string into a <code>Foo</code> and
-        will pass the <code>Foo</code> to your function for you.  This
-        can be convenient but is also a source of trouble when things
-        get converted and new objects created without you meaning them
-        to.  Declaring a constructor <code>explicit</code> prevents it
-        from being invoked implicitly as a conversion.
-      </DEFINITION>
-      <PROS>
-        Avoids undesirable conversions.
-      </PROS>
-      <CONS>
-        None.
-      </CONS>
-      <DECISION>
-        <p>
-          We require all single argument constructors to be
-          explicit. Always put <code>explicit</code> in front of
-          one-argument constructors in the class definition:
-          <code>explicit Foo(string name);</code>
-        </p>
-        <p>
-          The exception is copy constructors, which, in the rare
-          cases when we allow them, should probably not be
-          <code>explicit</code>.
-          
-          Classes that are intended to be
-          transparent wrappers around other classes are also
-          exceptions.
-          Such exceptions should be clearly marked with comments.
         </p>
       </DECISION>
     </BODY>
@@ -1554,170 +1299,6 @@ Tashana Landray
 -->
 
 <CATEGORY title="Other C++ Features">
-  <STYLEPOINT title="Reference Arguments">
-    <SUMMARY>
-      All parameters passed by reference must be labeled
-      <code>const</code>.
-    </SUMMARY>
-    <BODY>
-      <DEFINITION>
-        In C, if a function needs to modify a variable, the
-        parameter must use a pointer, eg <code>int foo(int
-        *pval)</code>.  In C++, the function can alternatively
-        declare a reference parameter: <code>int foo(int
-        &amp;val)</code>.
-      </DEFINITION>
-      <PROS>
-        Defining a parameter as reference avoids ugly code like
-        <code>(*pval)++</code>.  Necessary for some applications like
-        copy constructors.  Makes it clear, unlike with pointers, that
-        <code>NULL</code> is not a possible value.
-      </PROS>
-      <CONS>
-        References can be confusing, as they have value syntax but
-        pointer semantics.
-      </CONS>
-      <DECISION>
-        <p>
-          Within function parameter lists all references must be
-          <code>const</code>:
-        </p>
-        <CODE_SNIPPET>
-          void Foo(const string &amp;in, string *out);
-        </CODE_SNIPPET>
-        <p>
-          In fact it is a very strong convention in Google code that input
-          arguments are values or <code>const</code> references while
-          output arguments are pointers.  Input parameters may be
-          <code>const</code> pointers, but we never allow
-          non-<code>const</code> reference parameters.
-        </p>
-        <p>
-          One case when you might want an input parameter to be a
-          <code>const</code> pointer is if you want to emphasize that the
-          argument is not copied, so it must exist for the lifetime of the
-          object; it is usually best to document this in comments as
-          well.  STL adapters such as <code>bind2nd</code> and
-          <code>mem_fun</code> do not permit reference parameters, so
-          you must declare functions with pointer parameters in these
-          cases, too.
-        </p>
-      </DECISION>
-    </BODY>
-  </STYLEPOINT>
-
-  <STYLEPOINT title="Function Overloading">
-    <SUMMARY>
-      Use overloaded functions (including constructors) only if a
-      reader looking at a call site can get a good idea of what is
-      happening without having to first figure out exactly which
-      overload is being called.
-    </SUMMARY>
-    <BODY>
-      <DEFINITION>
-        <p>
-          You may write a function that takes a
-          <code>const string&amp;</code> and overload it with another that
-          takes <code>const char*</code>.
-        </p>
-        <CODE_SNIPPET>
-          class MyClass {
-           public:
-            void Analyze(const string &amp;text);
-            void Analyze(const char *text, size_t textlen);
-          };
-        </CODE_SNIPPET>
-      </DEFINITION>
-      <PROS>
-        Overloading can make code more intuitive by allowing an
-        identically-named function to take different arguments.  It
-        may be necessary for templatized code, and it can be
-        convenient for Visitors.
-      </PROS>
-      <CONS>
-        If a function is overloaded by the argument types alone, a
-        reader may have to understand C++'s complex matching rules in
-        order to tell what's going on.  Also many people are confused
-        by the semantics of inheritance if a derived class overrides
-        only some of the variants of a function.
-      </CONS>
-      <DECISION>
-        If you want to overload a function, consider qualifying the
-        name with some information about the arguments, e.g.,
-        <code>AppendString()</code>, <code>AppendInt()</code> rather
-        than just <code>Append()</code>.
-        
-      </DECISION>
-    </BODY>
-  </STYLEPOINT>
-
-  <STYLEPOINT title="Default Arguments">
-    <SUMMARY>
-      We do not allow default function parameters, except in
-      a few uncommon situations explained below.
-    </SUMMARY>
-    <BODY>
-      <PROS>
-        Often you have a function that uses lots of default values,
-        but occasionally you want to override the defaults.  Default
-        parameters allow an easy way to do this without having to
-        define many functions for the rare exceptions.
-      </PROS>
-      <CONS>
-        People often figure out how to use an
-        API by looking at existing code that uses it.
-        Default parameters are more difficult to maintain because
-        copy-and-paste from previous code may not reveal all the
-        parameters.  Copy-and-pasting of code segments can cause major
-        problems when the default arguments are not appropriate for
-        the new code.
-      </CONS>
-      <DECISION>
-        <p>
-          Except as described below, we require all arguments to be
-          explicitly specified, to force programmers to consider the API
-          and the values they are passing for each argument rather than
-          silently accepting defaults they may not be aware of.
-        </p>
-        <p>
-          One specific exception is when default arguments are used to
-          simulate variable-length argument lists.
-        </p>
-        <CODE_SNIPPET>
-          // Support up to 4 params by using a default empty AlphaNum.
-          string StrCat(const AlphaNum &amp;a,
-                        const AlphaNum &amp;b = gEmptyAlphaNum,
-                        const AlphaNum &amp;c = gEmptyAlphaNum,
-                        const AlphaNum &amp;d = gEmptyAlphaNum);
-        </CODE_SNIPPET>
-      </DECISION>
-    </BODY>
-  </STYLEPOINT>
-
-  <STYLEPOINT title="Variable-Length Arrays and alloca()">
-    <SUMMARY>
-      We do not allow variable-length arrays or <code>alloca()</code>.
-    </SUMMARY>
-    <BODY>
-      <PROS>
-        Variable-length arrays have natural-looking syntax.  Both
-        variable-length arrays and <code>alloca()</code> are very
-        efficient.
-      </PROS>
-      <CONS>
-        Variable-length arrays and alloca are not part of Standard
-        C++.  More importantly, they allocate a data-dependent amount
-        of stack space that can trigger difficult-to-find memory
-        overwriting bugs: "It ran fine on my machine, but dies
-        mysteriously in production".
-      </CONS>
-      
-      <DECISION>
-        Use a safe allocator instead, such as
-        <code>scoped_ptr</code>/<code>scoped_array</code>.
-      </DECISION>
-    </BODY>
-  </STYLEPOINT>
 
   <STYLEPOINT title="Friends">
     <SUMMARY>
@@ -1726,9 +1307,7 @@ Tashana Landray
     </SUMMARY>
     <BODY>
       <p>
-        Friends should usually be defined in the same file so that the
-        reader does not have to look in another file to find uses of
-        the private members of a class.  A common use of
+        A common use of
         <code>friend</code> is to have a <code>FooBuilder</code> class
         be a friend of <code>Foo</code> so that it can construct the
         inner state of <code>Foo</code> correctly, without exposing
@@ -1750,112 +1329,6 @@ Tashana Landray
       We do not use C++ exceptions.
     </SUMMARY>
     <BODY>
-      <PROS>
-        <ul>
-          <li>Exceptions allow higher levels of an application to
-          decide how to handle "can't happen" failures in deeply
-          nested functions, without the obscuring and error-prone
-          bookkeeping of error codes.</li>
-
-          
-
-          <li>Exceptions are used by most other modern
-          languages.  Using them in C++ would make it more consistent with
-          Python, Java, and the C++ that others are familiar with.</li>
-
-          <li>Some third-party C++ libraries use exceptions, and turning
-          them off internally makes it harder to integrate with those
-          libraries.</li>
-
-          <li>Exceptions are the only way for a constructor to fail.
-          We can simulate this with a factory function or an
-          <code>Init()</code> method, but these require heap
-          allocation or a new "invalid" state, respectively.</li>
-
-          <li>Exceptions are really handy in testing frameworks.</li>
-        </ul>
-      </PROS>
-      <CONS>
-        <ul>
-          <li>When you add a <code>throw</code> statement to an existing
-          function, you must examine all of its transitive callers. Either
-          they must make at least the basic exception safety guarantee, or
-          they must never catch the exception and be happy with the
-          program terminating as a result. For instance, if
-          <code>f()</code> calls <code>g()</code> calls
-          <code>h()</code>, and <code>h</code> throws an exception
-          that <code>f</code> catches, <code>g</code> has to be
-          careful or it may not clean up properly.</li>
-
-          <li>More generally, exceptions make the control flow of
-          programs difficult to evaluate by looking at code: functions
-          may return in places you don't expect. This causes
-          maintainability and debugging difficulties. You can minimize
-          this cost via some rules on how and where exceptions can be
-          used, but at the cost of more that a developer needs to know
-          and understand.</li>
-
-          <li>Exception safety requires both RAII and different coding
-          practices. Lots of supporting machinery is needed to make
-          writing correct exception-safe code easy. Further, to avoid
-          requiring readers to understand the entire call graph,
-          exception-safe code must isolate logic that writes to
-          persistent state into a "commit" phase. This will have both
-          benefits and costs (perhaps where you're forced to obfuscate
-          code to isolate the commit). Allowing exceptions would force
-          us to always pay those costs even when they're not worth
-          it.</li>
-
-          <li>Turning on exceptions adds data to each binary produced,
-          increasing compile time (probably slightly) and possibly
-          increasing address space pressure.
-          </li>
-
-          <li>The availability of exceptions may encourage developers
-          to throw them when they are not appropriate or recover from
-          them when it's not safe to do so. For example, invalid user
-          input should not cause exceptions to be thrown. We would
-          need to make the style guide even longer to document these
-          restrictions!</li>
-        </ul>
-      </CONS>
-      <DECISION>
-        <p>
-          On their face, the benefits of using exceptions outweigh the
-          costs, especially in new projects.  However, for existing code,
-          the introduction of exceptions has implications on all dependent
-          code.  If exceptions can be propagated beyond a new project, it
-          also becomes problematic to integrate the new project into
-          existing exception-free code.  Because most existing C++ code at
-          Google is not prepared to deal with exceptions, it is
-          comparatively difficult to adopt new code that generates
-          exceptions.
-        </p>
-        <p>
-          Given that Google's existing code is not exception-tolerant, the
-          costs of using exceptions are somewhat greater than the costs in
-          a new project.  The conversion process would be slow and
-          error-prone.  We don't believe that the available alternatives to
-          exceptions, such as error codes and assertions, introduce a
-          significant burden.
-          
-        </p>
-        <p>
-          Our advice against using exceptions is not predicated on
-          philosophical or moral grounds, but practical ones.
-          
-          Because we'd like to use our open-source
-          projects at Google and it's difficult to do so if those projects
-          use exceptions, we need to advise against exceptions in Google
-          open-source projects as well.
-          Things would probably be different if we had to do it all over
-          again from scratch.
-        </p>
-        <p>
-          There is an <a HREF="#Windows_Code">exception</a> to this
-          rule (no pun intended) for Windows code.
-        </p>
-      </DECISION>
     </BODY>
   </STYLEPOINT>
 
@@ -1868,51 +1341,8 @@ Tashana Landray
         RTTI allows a programmer to query the C++ class of an
         object at run time.
       </DEFINITION>
-      <PROS>
-        <p>
-          It is useful in some unittests. For example, it is useful in
-          tests of factory classes where the test has to verify that a
-          newly created object has the expected dynamic type.
-        </p>
-        <p>
-          In rare circumstances, it is useful even outside of
-          tests.
-        </p>
-      </PROS>
-      <CONS>
-        A query of type during run-time typically means a
-        design problem.  If you need to know the type of an
-        object at runtime, that is often an indication that
-        you should reconsider the design of your class.
-      </CONS>
       <DECISION>
-        <p>
-          Do not use RTTI, except in unittests.  If you find yourself
-          in need of writing code that behaves differently based on
-          the class of an object, consider one of the alternatives to
-          querying the type.
-        </p>
-        <p>
-          Virtual methods are the preferred way of executing different
-          code paths depending on a specific subclass type.  This puts
-          the work within the object itself.
-        </p>
-        <p>
-          If the work belongs outside the object and instead in some
-          processing code, consider a double-dispatch solution, such
-          as the Visitor design pattern.  This allows a facility
-          outside the object itself to determine the type of class
-          using the built-in type system.
-        </p>
-        <p>
-          If you think you truly cannot use those ideas,
-          
-          you may use RTTI.  But think twice
-          about it.  :-)  Then think twice again.
-          Do not hand-implement an RTTI-like workaround. The arguments
-          against RTTI apply just as much to workarounds like class
-          hierarchies with type tags.
-        </p>
+        <p>Qt and VTK have built in functionality for that.</p>
       </DECISION>
     </BODY>
   </STYLEPOINT>
@@ -1972,147 +1402,12 @@ Tashana Landray
     </BODY>
   </STYLEPOINT>
 
-  <STYLEPOINT title="Streams">
-    <SUMMARY>
-      Use streams only for logging.
-    </SUMMARY>
-    <BODY>
-      <DEFINITION>
-        Streams are a replacement for <code>printf()</code> and
-        <code>scanf()</code>.
-      </DEFINITION>
-      <PROS>
-        With streams, you do not need to know the type of the object
-        you are printing.  You do not have problems with format
-        strings not matching the argument list.  (Though with gcc, you
-        do not have that problem with <code>printf</code> either.)  Streams
-        have automatic constructors and destructors that open and close the
-        relevant files.
-      </PROS>
-      <CONS>
-        Streams make it difficult to do functionality like
-        <code>pread()</code>.  Some formatting (particularly the common
-        format string idiom <code>%.*s</code>) is difficult if not
-        impossible to do efficiently using streams without using
-        <code>printf</code>-like hacks.  Streams do not support operator
-        reordering (the <code>%1s</code> directive), which is helpful for
-        internationalization.
-      </CONS>
-      <DECISION>
-        
-        <p>
-          Do not use streams, except where required by a logging interface.
-          Use <code>printf</code>-like routines instead.
-        </p>
-        <p>
-          There are various pros and cons to using streams, but in
-          this case, as in many other cases, consistency trumps the
-          debate.  Do not use streams in your code.
-        </p>
-
-        <SUBSECTION title="Extended Discussion">
-          <p>
-            There has been debate on this issue, so this explains the
-            reasoning in greater depth.  Recall the Only One Way
-            guiding principle: we want to make sure that whenever we
-            do a certain type of I/O, the code looks the same in all
-            those places.  Because of this, we do not want to allow
-            users to decide between using streams or using
-            <code>printf</code> plus Read/Write/etc.  Instead, we should
-            settle on one or the other.  We made an exception for logging
-            because it is a pretty specialized application, and for
-            historical reasons.
-          </p>
-          <p>
-            Proponents of streams have argued that streams are the obvious
-            choice of the two, but the issue is not actually so clear.  For
-            every advantage of streams they point out, there is an
-            equivalent disadvantage.  The biggest advantage is that
-            you do not need to know the type of the object to be
-            printing.  This is a fair point.  But, there is a
-            downside: you can easily use the wrong type, and the
-            compiler will not warn you.  It is easy to make this
-            kind of mistake without knowing when using streams.
-          </p>
-          <CODE_SNIPPET>
-            cout &lt;&lt; this;  // Prints the address
-            cout &lt;&lt; *this;  // Prints the contents
-          </CODE_SNIPPET>
-          <p>
-            The compiler does not generate an error because
-            <code>&lt;&lt;</code> has been overloaded.  We discourage
-            overloading for just this reason.
-          </p>
-          <p>
-            Some say <code>printf</code> formatting is ugly and hard to
-            read, but streams are often no better.  Consider the following
-            two fragments, both with the same typo.  Which is easier to
-            discover?
-          </p>
-          <CODE_SNIPPET>
-             cerr &lt;&lt; "Error connecting to '" &lt;&lt; foo-&gt;bar()-&gt;hostname.first
-                  &lt;&lt; ":" &lt;&lt; foo-&gt;bar()-&gt;hostname.second &lt;&lt; ": " &lt;&lt; strerror(errno);
-
-             fprintf(stderr, "Error connecting to '%s:%u: %s",
-                     foo-&gt;bar()-&gt;hostname.first, foo-&gt;bar()-&gt;hostname.second,
-                     strerror(errno));
-          </CODE_SNIPPET>
-          <p>
-            And so on and so forth for any issue you might bring up.
-            (You could argue, "Things would be better with the right
-            wrappers," but if it is true for one scheme, is it not
-            also true for the other?  Also, remember the goal is to
-            make the language smaller, not add yet more machinery that
-            someone has to learn.)
-          </p>
-          <p>
-            Either path would yield different advantages and
-            disadvantages, and there is not a clearly superior
-            solution.  The simplicity doctrine mandates we settle on
-            one of them though, and the majority decision was on
-            <code>printf</code> + <code>read</code>/<code>write</code>.
-          </p>
-        </SUBSECTION>
-      </DECISION>
-    </BODY>
-  </STYLEPOINT>
-
   <STYLEPOINT title="Preincrement and Predecrement">
     <SUMMARY>
       Use prefix form (<code>++i</code>) of the increment and
       decrement operators with iterators and other template objects.
     </SUMMARY>
     <BODY>
-      <DEFINITION>
-        When a variable is incremented (<code>++i</code> or
-        <code>i++</code>) or decremented (<code>--i</code> or
-        <code>i--</code>) and the value of the expression is not used,
-        one must decide whether to preincrement (decrement) or
-        postincrement (decrement).
-      </DEFINITION>
-      <PROS>
-        When the return value is ignored, the "pre" form
-        (<code>++i</code>) is never less efficient than the "post"
-        form (<code>i++</code>), and is often more efficient.  This is
-        because post-increment (or decrement) requires a copy of
-        <code>i</code> to be made, which is the value of the
-        expression.  If <code>i</code> is an iterator or other
-        non-scalar type, copying <code>i</code> could be expensive.
-        Since the two types of increment behave the same when the
-        value is ignored, why not just always pre-increment?
-      </PROS>
-      <CONS>
-        The tradition developed, in C, of using post-increment when
-        the expression value is not used, especially in <code>for</code>
-        loops.  Some find post-increment easier to read, since the
-        "subject" (<code>i</code>) precedes the "verb" (<code>++</code>),
-        just like in English.
-      </CONS>
-      <DECISION>
-        For simple scalar (non-object) values there is no reason to
-        prefer one form and we allow either.  For iterators and other
-        template types, use pre-increment.
-      </DECISION>
     </BODY>
   </STYLEPOINT>
 
@@ -2206,246 +1501,6 @@ Tashana Landray
           you!
         </p>
       </SUBSECTION>
-    </BODY>
-  </STYLEPOINT>
-
-  <STYLEPOINT title="Integer Types">
-    <SUMMARY>
-      Of the built-in C++ integer types, the only one used
-      
-      is <code>int</code>.  If a program needs a variable of a different
-      size, use
-      
-      a precise-width integer type from
-      <code>&lt;stdint.h&gt;</code>, such as <code>int16_t</code>.
-    </SUMMARY>
-    <BODY>
-      <DEFINITION>
-        C++ does not specify the sizes of its integer types. Typically
-        people assume that <code>short</code> is 16 bits,
-        <code>int</code> is 32 bits, <code>long</code> is 32 bits and
-        <code>long long</code> is 64 bits.
-      </DEFINITION>
-      <PROS>
-        Uniformity of declaration.
-      </PROS>
-      <CONS>
-        The sizes of integral types in C++ can vary based on compiler
-        and architecture.
-      </CONS>
-      <DECISION>
-        <p>
-          
-          <code>&lt;stdint.h&gt;</code> defines
-          types like <code>int16_t</code>, <code>uint32_t</code>,
-          <code>int64_t</code>, etc.
-          You should always use those in preference to
-          <code>short</code>, <code>unsigned long long</code> and the
-          like, when you need a guarantee on the size of an integer.
-          Of the C integer types, only <code>int</code> should be
-          used.  When appropriate, you are welcome to use standard
-          types like <code>size_t</code> and <code>ptrdiff_t</code>.
-        </p>
-        <p>
-          We use <code>int</code> very often, for integers we know are not
-          going to be too big, e.g., loop counters. Use plain old
-          <code>int</code> for such things. You should assume that an
-          <code>int</code> is
-          
-          at least 32 bits,
-          but don't assume that it has more than 32 bits.
-          If you need a 64-bit integer type, use
-          <code>int64_t</code> or
-          <code>uint64_t</code>.
-        </p>
-        <p>
-          For integers we know can be "big",
-           use
-          <code>int64_t</code>.
-          
-        </p>
-        <p>
-          You should not use the unsigned integer types such as
-          <code>uint32_t</code>,
-          unless the quantity you are representing is really a bit pattern
-          rather than a number, or unless you need defined
-          twos-complement overflow. In particular, do not use unsigned
-          types to say a number will never be negative.  Instead, use
-          
-          assertions for this.
-        </p>
-        
-      </DECISION>
-
-      <SUBSECTION title="On Unsigned Integers">
-        <p>
-          Some people, including some textbook authors, recommend
-          using unsigned types to represent numbers that are never
-          negative.  This is intended as a form of self-documentation.
-          However, in C, the advantages of such documentation are
-          outweighed by the real bugs it can introduce.  Consider:
-        </p>
-        <CODE_SNIPPET>
-          for (unsigned int i = foo.Length()-1; i &gt;= 0; --i) ...
-        </CODE_SNIPPET>
-        <p>
-          This code will never terminate!  Sometimes gcc will notice
-          this bug and warn you, but often it will not.  Equally bad
-          bugs can occur when comparing signed and unsigned
-          variables.  Basically, C's type-promotion scheme causes
-          unsigned types to behave differently than one might expect.
-        </p>
-        <p>
-          So, document that a variable is non-negative using
-          assertions.
-          Don't use an unsigned type.
-        </p>
-      </SUBSECTION>
-    </BODY>
-  </STYLEPOINT>
-
-  <STYLEPOINT title="64-bit Portability">
-    <SUMMARY>
-      Code should be 64-bit and 32-bit friendly.  Bear in mind problems of
-      printing, comparisons, and structure alignment.
-    </SUMMARY>
-    <BODY>
-      <ul>
-        <li>
-          <p>
-            <code>printf()</code> specifiers for some types are
-            not cleanly portable between 32-bit and 64-bit
-            systems. C99 defines some portable format
-            specifiers. Unfortunately, MSVC 7.1 does not
-            understand some of these specifiers and the
-            standard is missing a few, so we have to define our
-            own ugly versions in some cases (in the style of the
-            standard include file <code>inttypes.h</code>):
-          </p>
-          <CODE_SNIPPET>
-            // printf macros for size_t, in the style of inttypes.h
-            #ifdef _LP64
-            #define __PRIS_PREFIX "z"
-            #else
-            #define __PRIS_PREFIX
-            #endif
-
-            // Use these macros after a % in a printf format string
-            // to get correct 32/64 bit behavior, like this:
-            // size_t size = records.size();
-            // printf("%"PRIuS"\n", size);
-
-            #define PRIdS __PRIS_PREFIX "d"
-            #define PRIxS __PRIS_PREFIX "x"
-            #define PRIuS __PRIS_PREFIX "u"
-            #define PRIXS __PRIS_PREFIX "X"
-            #define PRIoS __PRIS_PREFIX "o"
-          </CODE_SNIPPET>
-          <table border="1" summary="portable printf specifiers">
-            <TBODY>
-              <tr align="center">
-                <th>Type</th>
-                <th>DO NOT use</th>
-                <th>DO use</th>
-                <th>Notes</th>
-              </tr>
-              <tr align="center">
-                <td><code>void *</code> (or any pointer)</td>
-                <td><code>%lx</code></td>
-                <td><code>%p</code></td>
-                <td> </td>
-              </tr>
-              
-              <tr align="center">
-                <td><code>int64_t</code></td>
-                <td><code>%qd</code>,
-                     <code>%lld</code></td>
-                <td><code>%"PRId64"</code></td>
-                <td/>
-              </tr>
-              
-              <tr align="center">
-                <td><code>uint64_t</code></td>
-                <td><code>%qu</code>,
-                    <code>%llu</code>,
-                    <code>%llx</code></td>
-                <td><code>%"PRIu64"</code>,
-                    <code>%"PRIx64"</code></td>
-                <td/>
-              </tr>
-              
-              <tr align="center">
-                <td><code>size_t</code></td>
-                <td><code>%u</code></td>
-                <td><code>%"PRIuS"</code>,
-                    <code>%"PRIxS"</code></td>
-                <td>C99 specifies <code>%zu</code></td>
-              </tr>
-              <tr align="center">
-                <td><code>ptrdiff_t</code></td>
-                <td><code>%d</code></td>
-                <td><code>%"PRIdS"</code></td>
-                <td>C99 specifies <code>%zd</code></td>
-              </tr>
-              
-            </TBODY>
-          </table>
-          <p>
-            Note that the <code>PRI*</code> macros expand to independent
-            strings which are concatenated by the compiler. Hence
-            if you are using a non-constant format string, you
-            need to insert the value of the macro into the format,
-            rather than the name. It is still possible, as usual,
-            to include length specifiers, etc., after the
-            <code>%</code> when using the <code>PRI*</code>
-            macros. So, e.g.  <code>printf("x = %30"PRIuS"\n",
-            x)</code> would expand on 32-bit Linux to
-            <code>printf("x = %30" "u" "\n", x)</code>, which the
-            compiler will treat as <code>printf("x = %30u\n",
-            x)</code>.
-          </p>
-          
-          </li>
-
-        <li> Remember that <code>sizeof(void *)</code> !=
-             <code>sizeof(int)</code>.  Use <code>intptr_t</code> if
-             you want a pointer-sized integer.
-             </li>
-
-        <li> You may need to be careful with structure alignments,
-             particularly for structures being stored on disk. Any
-             class/structure with a
-             
-             <code>int64_t</code>/<code>uint64_t</code>
-             member will by default end up being 8-byte aligned on a 64-bit
-             system. If you have such structures being shared on disk
-             between 32-bit and 64-bit code, you will need to ensure
-             that they are packed the same on both architectures.
-             
-             Most compilers offer a way to alter
-             structure alignment.  For gcc, you can use
-             <code>__attribute__((packed))</code>.  MSVC offers
-             <code>#pragma pack()</code> and
-             <code>__declspec(align())</code>.
-             </li>
-
-        <li>
-             
-             Use the <code>LL</code> or <code>ULL</code> suffixes as
-             needed to create 64-bit constants.  For example:
-             
-             <CODE_SNIPPET>
-             int64_t my_value = 0x123456789LL;
-             uint64_t my_mask = 3ULL &lt;&lt; 48;
-             </CODE_SNIPPET>
-             </li>
-
-        <li> If you really need different code on 32-bit and 64-bit
-             systems, use <code>#ifdef _LP64</code> to choose between
-             the code variants. (But please avoid this if
-             possible, and keep any such changes localized.)
-             </li>
-      </ul>
     </BODY>
   </STYLEPOINT>
 
@@ -2555,122 +1610,6 @@ Tashana Landray
   </BODY>
   </STYLEPOINT>
 
-  <STYLEPOINT title="Boost">
-  <SUMMARY>
-    Use only approved libraries from the Boost library collection.
-  </SUMMARY>
-  <BODY>
-    <DEFINITION>
-      The <a href="http://www.boost.org/">Boost library collection</a> is
-      a popular collection of peer-reviewed, free, open-source C++ libraries.
-    </DEFINITION>
-    <PROS>
-      Boost code is generally very high-quality, is widely portable, and fills
-      many important gaps in the C++ standard library, such as type traits,
-      better binders, and better smart pointers. It also provides an
-      implementation of the TR1 extension to the standard library.
-    </PROS>
-    <CONS>
-      Some Boost libraries encourage coding practices which can hamper
-      readability, such as metaprogramming and other advanced template
-      techniques, and an excessively "functional" style of programming.
-      
-    </CONS>
-    <DECISION>
-      
-      <div>
-        
-        In order to maintain a high level of readability for all contributors
-        who might read and maintain code, we only allow an approved subset of
-        Boost features.  Currently, the following libraries are permitted:
-        <ul>
-          <li> <a href="http://www.boost.org/libs/utility/call_traits.htm">
-               Call Traits</a> from <code>boost/call_traits.hpp</code>
-               </li>
-          <li> <a href="http://www.boost.org/libs/utility/compressed_pair.htm">
-               Compressed Pair</a> from <code>boost/compressed_pair.hpp</code>
-               </li>
-          <li> <a href="http://www.boost.org/libs/ptr_container/">
-               Pointer Container</a> from <code>boost/ptr_container</code> except
-               serialization and wrappers for containers not in the C++03
-               standard (<code>ptr_circular_buffer.hpp</code> and
-               <code>ptr_unordered*</code>)
-               </li>
-          <li> <a href="http://www.boost.org/libs/array/">
-               Array</a> from <code>boost/array.hpp</code>
-               </li>
-          <li> <a href="http://www.boost.org/libs/graph/">
-               The Boost Graph Library (BGL)</a> from <code>boost/graph</code>,
-               except serialization (<code>adj_list_serialize.hpp</code>) and
-               parallel/distributed algorithms and data structures
-               (<code>boost/graph/parallel/*</code> and
-               <code>boost/graph/distributed/*</code>).
-               </li>
-          <li> <a href="http://www.boost.org/libs/property_map/">
-               Property Map</a> from <code>boost/property_map</code>, except
-               parallel/distributed property maps
-               (<code>boost/property_map/parallel/*</code>).
-               </li>
-          <li> The part of
-               <a href="http://www.boost.org/libs/iterator/">
-               Iterator</a> that deals with defining iterators:
-               <code>boost/iterator/iterator_adaptor.hpp</code>,
-               <code>boost/iterator/iterator_facade.hpp</code>, and
-               <code>boost/function_output_iterator.hpp</code></li>
-        </ul>
-        We are actively considering adding other Boost features to the list, so
-        this rule may be relaxed in the future.
-      </div>
-    </DECISION>
-  </BODY>
-  </STYLEPOINT>
-
-  <STYLEPOINT title="C++0x">
-  <SUMMARY>
-    Use only approved libraries and language extensions from C++0x.
-    Currently, none are approved.
-  </SUMMARY>
-  <BODY>
-    <DEFINITION>
-      C++0x is the next ISO C++ standard, currently in
-      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3092.pdf">final
-      committee draft</a> form.  It contains
-      <a href="http://en.wikipedia.org/wiki/C%2B%2B0x">significant
-      changes</a> both to the language and libraries.
-    </DEFINITION>
-    <PROS>
-      We expect that C++0x will become the next standard, and eventually will
-      be supported by most C++ compilers.  It standardizes some common C++
-      extensions that we use already, allows shorthands for some operations,
-      and has some safety improvements.
-    </PROS>
-    <CONS>
-      <p>
-        The C++0x standard is substantialy more complex than its predecessor
-        (1,300 pages versus 800 pages), and is
-        unfamilar to many developers.  The long-term effects of some
-        features on code readability and maintenance are unknown.  We cannot
-        predict when its various features will be implemented uniformly by
-        tools that may be of interest (gcc, icc, clang, Eclipse, etc.).
-      </p>
-      <p>
-        As with <a href="#Boost">Boost</a>, some C++0x extensions encourage
-        coding practices that hamper readability&#8212;for example by removing
-        checked redundancy (such as type names) that may be helpful to readers,
-        or by encouraging template metaprogramming.  Other extensions
-        duplicate functionality available through existing
-        mechanisms, which may lead to
-        confusion and conversion costs.
-      </p>
-    </CONS>
-    <DECISION>
-      Use only C++0x libraries and language features that have been approved
-      for use.  Currently, no such features are approved.
-      Features will be approved individually as appropriate.
-    </DECISION>
-  </BODY>
-  </STYLEPOINT>
-
 </CATEGORY>
 
 <CATEGORY title="Naming">
@@ -2695,7 +1634,7 @@ Tashana Landray
     <SUMMARY>
       Function names, variable names, and filenames should be
       descriptive; eschew abbreviation.  Types and variables should be
-      nouns, while functions should be "command" verbs.
+      nouns, while functions should be imperative verbs.
     </SUMMARY>
     <BODY>
       <SUBSECTION title="How to Name">
@@ -2706,30 +1645,26 @@ Tashana Landray
           new reader. Examples of well-chosen names:
         </p>
         <CODE_SNIPPET>
-          int num_errors;                  // Good.
-          int num_completed_connections;   // Good.
+          int numErrors;                  // Good.
+          int numCompletedConnections;    // Good.
         </CODE_SNIPPET>
         <p>
           Poorly-chosen names use ambiguous abbreviations or arbitrary
           characters that do not convey meaning:
         </p>
         <BAD_CODE_SNIPPET>
-          int n;                           // Bad - meaningless.
-          int nerr;                        // Bad - ambiguous abbreviation.
-          int n_comp_conns;                // Bad - ambiguous abbreviation.
+          int n;                         // Bad - meaningless.
+          int nerr;                      // Bad - ambiguous abbreviation.
+          int nCompConns;                // Bad - ambiguous abbreviation.
         </BAD_CODE_SNIPPET>
         <p>
           Type and variable names should typically be nouns: e.g.,
-          <code>FileOpener</code>,
-          
-          <code>num_errors</code>.
+          <code>fileOpener</code>, <code>numErrors</code>.
         </p>
         <p>
           Function names should typically be imperative (that is they
-          should be commands): e.g., <code>OpenFile()</code>,
-          <code>set_num_errors()</code>.  There is an exception for
-          accessors, which, described more completely in <a HREF="#Function_Names">Function Names</a>, should be named
-          the same as the variable they access.
+          should be commands): e.g., <code>openFile()</code>,
+          <code>setNumErrors()</code>.
         </p>
       </SUBSECTION>
 
@@ -2741,23 +1676,23 @@ Tashana Landray
         <CODE_SNIPPET>
           // Good
           // These show proper names with no abbreviations.
-          int num_dns_connections;  // Most people know what "DNS" stands for.
-          int price_count_reader;   // OK, price count. Makes sense.
+          int numDnsConnections;  // Most people know what "DNS" stands for.
+          int priceCountReader;   // OK, price count. Makes sense.
         </CODE_SNIPPET>
         <BAD_CODE_SNIPPET>
           // Bad!
           // Abbreviations can be confusing or ambiguous outside a small group.
-          int wgc_connections;  // Only your group knows what this stands for.
-          int pc_reader;        // Lots of things can be abbreviated "pc".
+          int wgcConnections;  // Only your group knows what this stands for.
+          int pcReader;        // Lots of things can be abbreviated "pc".
         </BAD_CODE_SNIPPET>
         <p>
           Never abbreviate by leaving out letters:
         </p>
         <CODE_SNIPPET>
-          int error_count;  // Good.
+          int errorCount;  // Good.
         </CODE_SNIPPET>
         <BAD_CODE_SNIPPET>
-          int error_cnt;    // Bad.
+          int errorCnt;    // Bad.
         </BAD_CODE_SNIPPET>
       </SUBSECTION>
     </BODY>
@@ -2827,38 +1762,12 @@ Tashana Landray
     <SUMMARY>
       Variable names start lowercase and then camel case. Class member
       variables start with an underscore.  For
-      instance: <code>int myExcitingLocalVariable</code>,
-      <code>_myExcitingMemberVariable</code>.
+      instance: <code>myExcitingLocalVariable</code>,
+      <code>_myExcitingMemberVariable</code>. As an alternative you can use
+      lowercase names with underscores: <code>_my_exciting_member_variable</code>.
+      But be consistent in a file!  
     </SUMMARY>
     <BODY>
-      <!--
-      <SUBSECTION title="Common Variable names">
-        <p>
-          For example:
-        </p>
-        <CODE_SNIPPET>
-          string table_name;  // OK - uses underscore.
-          string tablename;   // OK - all lowercase.
-        </CODE_SNIPPET>
-        <BAD_CODE_SNIPPET>
-          string tableName;   // Bad - mixed case.
-        </BAD_CODE_SNIPPET>
-      </SUBSECTION>
-
-      <SUBSECTION title="Class Data Members">
-        <p>
-          Data members (also called instance variables or member
-          variables) are lowercase with optional underscores like
-          regular variable names, but always end with a trailing
-          underscore.
-        </p>
-        <CODE_SNIPPET>
-          string table_name_;  // OK - underscore at end.
-          string tablename_;   // OK.
-        </CODE_SNIPPET>
-      </SUBSECTION>
-      -->
-
       <SUBSECTION title="Struct Variables">
         <p>
           Data members in structs should be named like regular
@@ -2877,38 +1786,9 @@ Tashana Landray
         </p>
       </SUBSECTION>
 
-      <!--
-      <SUBSECTION title="Global Variables">
-        <p>
-          There are no special requirements for global variables,
-          which should be rare in any case, but if you use one,
-          consider prefixing it with <code>g_</code> or some other
-          marker to easily distinguish it from local variables.
-        </p>
-      </SUBSECTION>
-      -->
     </BODY>
   </STYLEPOINT>
 
-  <!--
-  <STYLEPOINT title="Constant Names">
-    <SUMMARY>
-      Use a <code>k</code> followed by mixed case:
-      <code>kDaysInAWeek</code>.
-    </SUMMARY>
-    <BODY>
-      <p>
-        All compile-time constants, whether they are declared locally,
-        globally, or as part of a class, follow a slightly different
-        naming convention from other variables. Use a <code>k</code>
-        followed by words with uppercase first letters:
-      </p>
-      <CODE_SNIPPET>
-        const int kDaysInAWeek = 7;
-      </CODE_SNIPPET>
-    </BODY>
-  </STYLEPOINT>
-  -->
 
   <STYLEPOINT title="Function Names">
     <SUMMARY>
@@ -2964,9 +1844,10 @@ Tashana Landray
   <STYLEPOINT title="Namespace Names">
     
     <SUMMARY>
-      Namespace names are all lower-case, and based on project names and
-      possibly their directory structure:
-      <code>google_awesome_project</code>.
+      Namespaces names are named like <A HRED="#Type_Names">types</A>.
+      They start with a capital letter and have a capital letter for
+      each new word, with no underscores:
+      <code>MyNamespace</code>.
     </SUMMARY>
     <BODY>
       <p>
@@ -2978,43 +1859,22 @@ Tashana Landray
 
   <STYLEPOINT title="Enumerator Names">
     <SUMMARY>
-      Enumerators should be named <i>either</i> like
-      <A HREF="#Constant_Names">constants</A> or like
-      <A HREF="#Macro_Names">macros</A>: either <code>kEnumName</code>
-      or <code>ENUM_NAME</code>.
+      Enumerators should also be named like
+      <A HREF="#Type_Names">type names</A>: <code>EnumName</code>.
     </SUMMARY>
     <BODY>
       <p>
         Preferably, the individual enumerators should be named like
-        <A HREF="#Constant_Names">constants</A>.  However, it is also
-        acceptable to name them like <A HREF="#Macro_Names">macros</A>.    The enumeration name,
-        <code>UrlTableErrors</code> (and
-        <code>AlternateUrlTableErrors</code>), is a type, and
-        therefore mixed case.
+        <A HREF="#Macro_Names">macros</A>.
       </p>
       <CODE_SNIPPET>
         enum UrlTableErrors {
-          kOK = 0,
-          kErrorOutOfMemory,
-          kErrorMalformedInput,
-        };
-        enum AlternateUrlTableErrors {
           OK = 0,
           OUT_OF_MEMORY = 1,
-          MALFORMED_INPUT = 2,
+          MALFORMED_INPUT = 2
         };
       </CODE_SNIPPET>
-      <p>
-        Until January 2009, the style was to name enum values like
-        <A HREF="#Macro_Names">macros</A>.  This caused problems with
-        name collisions between enum values and macros.  Hence, the
-        change to prefer constant-style naming was put in place.  New
-        code should prefer constant-style naming if possible.
-        However, there is no reason to change old code to use
-        constant-style names, unless the old names are actually
-        causing a compile-time problem.
-      </p>
-      
+    
     </BODY>
   </STYLEPOINT>
 
@@ -3045,21 +1905,6 @@ Tashana Landray
       scheme.
     </SUMMARY>
     <BODY>
-      <p>
-        <dl>
-          <dt> <code>bigopen()</code> </dt>
-          <dd>   function name, follows form of <code>open()</code> </dd>
-          <dt> <code>uint</code> </dt>
-          <dd>   <code>typedef</code> </dd>
-          <dt> <code>bigpos</code> </dt>
-          <dd>   <code>struct</code> or <code>class</code>, follows form of
-                 <code>pos</code> </dd>
-          <dt> <code>sparse_hash_map</code> </dt>
-          <dd>   STL-like entity; follows STL naming conventions </dd>
-          <dt> <code>LONGLONG_MAX</code> </dt>
-          <dd>   a constant, as in <code>INT_MAX</code> </dd>
-        </dl>
-      </p>
     </BODY>
   </STYLEPOINT>
 </CATEGORY>
@@ -3330,19 +2175,6 @@ Tashana Landray
         </CODE_SNIPPET>
       </SUBSECTION>
 
-      <!--
-      <SUBSECTION title="Global Variables">
-        <p>
-          As with data members, all global variables should have a
-          comment describing what they are and what they are used for.
-          For example:
-        </p>
-        <CODE_SNIPPET>
-          // The total number of tests cases that we run through in this regression test.
-          const int kNumTestCases = 6;
-        </CODE_SNIPPET>
-      </SUBSECTION>
-      -->
     </BODY>
   </STYLEPOINT>
 
@@ -3420,20 +2252,6 @@ Tashana Landray
                                             false,  // Not the first time we're calling this.
                                             NULL);  // No callback.
         </CODE_SNIPPET>
-        <!--
-        <p>
-          Or alternatively, constants or self-describing variables:
-        </p>
-        <CODE_SNIPPET>
-          const int kDefaultBaseValue = 10;
-          const bool kFirstTimeCalling = false;
-          Callback *null_callback = NULL;
-          bool success = CalculateSomething(interesting_value,
-                                            kDefaultBaseValue,
-                                            kFirstTimeCalling,
-                                            null_callback);
-        </CODE_SNIPPET>
-        -->
       </SUBSECTION>
 
       <SUBSECTION title="Dont's">
@@ -3514,43 +2332,6 @@ Tashana Landray
     </BODY>
   </STYLEPOINT>
 
-  <STYLEPOINT title="Deprecation Comments">
-    <SUMMARY>
-      Mark deprecated interface points with <code>DEPRECATED</code> comments.
-    </SUMMARY>
-    <BODY>
-      <p>
-      You can mark an interface as deprecated by writing a comment containing
-      the word <code>DEPRECATED</code> in all caps.  The comment goes either
-      before the declaration of the interface or on the same line as the
-      declaration.
-      </p>
-      
-      <p>
-      After the word <code>DEPRECATED</code>, write your name, e-mail address,
-      or other identifier in parentheses.
-      </p>
-      <p>
-      A deprecation comment must include simple, clear directions for people to
-      fix their callsites.  In C++, you can implement a deprecated function as
-      an inline function that calls the new interface point.
-      </p>
-      <p>
-      Marking an interface point <code>DEPRECATED</code> will not magically
-      cause any callsites to change.  If you want people to actually stop using
-      the deprecated facility, you will have to fix the callsites yourself or
-      recruit a crew to help you.
-      </p>
-      <p>
-      New code should not contain calls to deprecated interface points.  Use
-      the new interface point instead.  If you cannot understand the
-      directions, find the person who created the deprecation and ask them for
-      help using the new interface point.
-      </p>
-      
-    </BODY>
-  </STYLEPOINT>
-
 </CATEGORY>
 
 <CATEGORY title="Formatting">
@@ -3577,7 +2358,7 @@ Tashana Landray
 
   <STYLEPOINT title="Line Length">
     <SUMMARY>
-      Each line of text in your code should be at most 80 characters
+      Each line of text in your code should be at most 100 characters
       long.
     </SUMMARY>
     <BODY>
@@ -3608,66 +2389,18 @@ Tashana Landray
       </CONS>
       <DECISION>
         <p>
-          
-          80 characters is the maximum.
-        </p>
-        <p>
-          Exception: if a comment line contains an example command or
-          a literal URL longer than 80 characters, that line may be
-          longer than 80 characters for ease of cut and paste.
-        </p>
-        <p>
-          Exception: an <code>#include</code> statement with a long
-          path may exceed 80 columns.  Try to avoid situations where this
-          becomes necessary.
-        </p>
-        <p>
-          Exception:  you needn't be concerned about
-          <a href="#The__define_Guard">header guards</a>
-          that exceed the maximum length.
-          
+          100 characters should be the maximum.
         </p>
       </DECISION>
     </BODY>
   </STYLEPOINT>
 
-  <STYLEPOINT title="Non-ASCII Characters">
-    <SUMMARY>
-      Non-ASCII characters should be rare, and must use UTF-8 formatting.
-    </SUMMARY>
-    <BODY>
-      <p>
-        You shouldn't hard-code user-facing text in source, even English,
-        so use of non-ASCII characters should be rare.  However, in certain
-        cases it is appropriate to include such words in your code.  For
-        example, if your code parses data files from foreign sources,
-        it may be appropriate to hard-code the non-ASCII string(s) used in
-        those data files as delimiters.  More commonly, unittest code
-        (which does not
-        
-        need to be localized) might contain non-ASCII strings.  In such
-        cases, you should use UTF-8, since that is
-        
-        an encoding understood by most tools able
-        to handle more than just ASCII.
-        Hex encoding is also OK, and encouraged where it enhances
-        readability &#8212; for example, <code>"\xEF\xBB\xBF"</code> is the
-        Unicode zero-width no-break space character, which would be
-        invisible if included in the source as straight UTF-8.
-      </p>
-    </BODY>
-  </STYLEPOINT>
-
   <STYLEPOINT title="Spaces vs. Tabs">
     <SUMMARY>
-      Use only spaces, and indent 2 spaces at a time.
+      Use either spaces or tabs. When using spaces indent 4 spaces at a time.
+      Be consistent in a file!
     </SUMMARY>
     <BODY>
-      <p>
-        We use spaces for indentation. Do not use tabs in your code.
-        You should set your editor to emit spaces when you hit the tab
-        key.
-      </p>
     </BODY>
   </STYLEPOINT>
   
@@ -3677,11 +2410,11 @@ Tashana Landray
       for bracket indenting. This style puts the brace associated with
       a control statement on the next line, indented to the same level
       as the control statement. Statements within the braces are indented
-      to the next level.
+      to the next level. Alternatively use <a href="http://en.wikipedia.org/wiki/Indent_style#K.26R_style">K&amp;R style</a>. Be consistent in a file!
     </SUMMARY>
     <BODY>
       <p>
-        Advantages of this style are that the indented code is clearly
+        Advantages of the Allman style are that the indented code is clearly
         set apart from the containing statement by lines that are almost
         completely whitespace, improving readability, and the closing brace
         lines up in the same column as the opening brace, making it easy to
@@ -3694,6 +2427,9 @@ Tashana Landray
             doSomethingElse();
         }
       </CODE_SNIPPET>
+      <p>
+        K&amp;R style is more compact but lacks some clearness.
+      </p>
     </BODY>
   </STYLEPOINT>
 
@@ -3816,373 +2552,6 @@ Tashana Landray
         // variable means.
         void Circle::rotate(double) {}
       </BAD_CODE_SNIPPET>
-    </BODY>
-  </STYLEPOINT>
-
-  <STYLEPOINT title="Function Calls">
-    <SUMMARY>
-      On one line if it fits; otherwise, wrap arguments at the
-      parenthesis.
-    </SUMMARY>
-    <BODY>
-      <p>
-        Function calls have the following format:
-      </p>
-      <CODE_SNIPPET>
-        bool retval = doSomething(argument1, argument2, argument3);
-      </CODE_SNIPPET>
-      <p>
-        If the arguments do not all fit on one line, they should be
-        broken up onto multiple lines, with each subsequent line
-        aligned with the first argument.  Do not add spaces after the
-        open paren or before the close paren:
-      </p>
-      <CODE_SNIPPET>
-        bool retval = doSomething(averyveryveryverylongargument1,
-                                  argument2, argument3);
-      </CODE_SNIPPET>
-      <p>
-        If the function has many arguments, consider having one per
-        line if this makes the code more readable:
-      </p>
-      <CODE_SNIPPET>
-        bool retval = doSomething(argument1,
-                                  argument2,
-                                  argument3,
-                                  argument4);
-      </CODE_SNIPPET>
-      <p>
-        If the function signature is so long that it cannot fit within
-        the maximum <a href="#Line_Length">line length</a>, you may
-        place all arguments on subsequent lines:
-      </p>
-      <CODE_SNIPPET>
-        if (...)
-        {
-          ...
-          ...
-          if (...)
-          {
-            doSomethingThatRequiresALongFunctionName(
-                veryLongArgument1,  // 4 space indent
-                argument2,
-                argument3,
-                argument4);
-          }
-      </CODE_SNIPPET>
-    </BODY>
-  </STYLEPOINT>
-
-  <STYLEPOINT title="Conditionals">
-    <SUMMARY>
-      Prefer no spaces inside parentheses.  The <code>else</code>
-      keyword belongs on a new line.
-    </SUMMARY>
-    <BODY>
-      <p>
-        There are two acceptable formats for a basic conditional
-        statement. One includes spaces between the parentheses and the
-        condition, and one does not.
-      </p>
-      <p>
-        The most common form is without spaces.  Either is fine, but
-        <em>be consistent</em>. If you are modifying a file, use the
-        format that is already present. If you are writing new code,
-        use the format that the other files in that directory or
-        project use. If in doubt and you have no personal preference,
-        do not add the spaces.
-      </p>
-      <CODE_SNIPPET>
-        if (condition) // no spaces inside parentheses
-        {
-          ...  // 2 space indent.
-        }
-        else
-        {
-          ...
-        }
-      </CODE_SNIPPET>
-      <p>
-        If you prefer you may add spaces inside the
-        parentheses:
-      </p>
-      <CODE_SNIPPET>
-        if ( condition ) // spaces inside parentheses - rare
-        {
-          ...  // 2 space indent.
-        }
-        else
-        {
-          ...
-        }
-      </CODE_SNIPPET>
-      <p>
-        Note that in all cases you must have a space between the
-        <code>if</code> and the open parenthesis.
-      </p>
-      <BAD_CODE_SNIPPET>
-        if(condition)     // Bad - space missing after IF.
-      </BAD_CODE_SNIPPET>
-      <CODE_SNIPPET>
-        if (condition)  // Good - proper space after IF.
-      </CODE_SNIPPET>
-      <p>
-        Short conditional statements may be written on one line if
-        this enhances readability.  You may use this only when the
-        line is brief and the statement does not use the
-        <code>else</code> clause.
-      </p>
-      <CODE_SNIPPET>
-        if (x == kFoo) return new Foo();
-        if (x == kBar) return new Bar();
-      </CODE_SNIPPET>
-      <p>
-        This is not allowed when the if statement has an
-        <code>else</code>:
-      </p>
-      <BAD_CODE_SNIPPET>
-        // Not allowed - IF statement on one line when there is an ELSE clause
-        if (x) doThis();
-        else doThat();
-      </BAD_CODE_SNIPPET>
-      <p>
-        In general, curly braces are not required for single-line
-        statements, but they are allowed if you like them;
-        conditional or loop statements with complex conditions or
-        statements may be more readable with curly braces. Some
-        
-        projects
-        require that an <CODE>if</CODE> must always always have an
-        accompanying brace.
-      </p>
-      <CODE_SNIPPET>
-        if (condition)
-          doSomething();  // 2 space indent.
-
-        if (condition)
-        {
-          doSomething();  // 2 space indent.
-        }
-      </CODE_SNIPPET>
-      <p>
-        However, if one part of an <code>if</code>-<code>else</code>
-        statement uses curly braces, the other part must too:
-      </p>
-      <BAD_CODE_SNIPPET>
-        // Not allowed - curly on IF but not ELSE
-        if (condition)
-        {
-          foo;
-        }
-        else
-          bar;
-
-        // Not allowed - curly on ELSE but not IF
-        if (condition)
-          foo;
-        else
-        {
-          bar;
-        }
-      </BAD_CODE_SNIPPET>
-      <CODE_SNIPPET>
-        // Curly braces around both IF and ELSE required because
-        // one of the clauses used braces.
-        if (condition)
-        {
-          foo;
-        }
-        else
-        {
-          bar;
-        }
-      </CODE_SNIPPET>
-    </BODY>
-  </STYLEPOINT>
-
-  <STYLEPOINT title="Loops and Switch Statements">
-    <SUMMARY>
-      Switch statements may use braces for blocks.  Empty loop bodies should use
-      <code>{}</code> or <code>continue</code>.
-    </SUMMARY>
-    <BODY>
-      <p>
-        <code>case</code> blocks in <code>switch</code> statements can have
-        curly braces or not, depending on your preference.  If you do
-        include curly braces they should be placed as shown below.
-      </p>
-      <p>
-        If not conditional on an enumerated value, switch statements
-        should always have a <code>default</code> case (in the case of
-        an enumerated value, the compiler will warn you if any values
-        are not handled).  If the default case should never execute,
-        simply
-        <code>assert</code>:
-      </p>
-      
-      <CODE_SNIPPET>
-        switch (var)
-        {
-          case 0:
-          { 
-            ...
-            break;
-          }
-          case 1:
-          {
-            ...
-            break;
-          }
-          default:
-          {
-            assert(false);
-          }
-        }
-      </CODE_SNIPPET>
-      <p>
-        Empty loop bodies should use <code>{}</code> or
-        <code>continue</code>, but not a single semicolon.
-      </p>
-      <CODE_SNIPPET>
-        while (condition)
-        {
-          // Repeat test until it returns false.
-        }
-        for (int i = 0; i &lt; kSomeNumber; ++i) {}  // Good - empty body.
-        while (condition) continue;  // Good - continue indicates no logic.
-      </CODE_SNIPPET>
-      <BAD_CODE_SNIPPET>
-        while (condition);  // Bad - looks like part of do/while loop.
-      </BAD_CODE_SNIPPET>
-    </BODY>
-  </STYLEPOINT>
-
-  <STYLEPOINT title="Pointer and Reference Expressions">
-    <SUMMARY>
-      No spaces around period or arrow.  Pointer operators do not have
-      trailing spaces.
-    </SUMMARY>
-    <BODY>
-      <p>
-        The following are examples of correctly-formatted pointer and
-        reference expressions:
-      </p>
-      <CODE_SNIPPET>
-        x = *p;
-        p = &amp;x;
-        x = r.y;
-        x = r-&gt;y;
-      </CODE_SNIPPET>
-      <p>
-        Note that:
-      </p>
-      <ul>
-        <li> There are no spaces around the period or arrow when
-             accessing a member.
-             </li>
-        <li> Pointer operators have no space after the <code>*</code> or
-             <code>&amp;</code>.
-             </li>
-      </ul>
-      <p>
-        When declaring a pointer variable or argument, you may place
-        the asterisk adjacent to either the type or to the variable
-        name:
-      </p>
-      <CODE_SNIPPET>
-        // These are fine, space preceding.
-        char *c;
-        const string &amp;str;
-
-        // These are fine, space following.
-        char* c;    // but remember to do "char* c, *d, *e, ...;"!
-        const string&amp; str;
-      </CODE_SNIPPET>
-      <BAD_CODE_SNIPPET>
-        char * c;  // Bad - spaces on both sides of *
-        const string &amp; str;  // Bad - spaces on both sides of &amp;
-      </BAD_CODE_SNIPPET>
-      <p>
-        You should do this consistently within a single
-        file,
-        so, when modifying an existing file, use the style in that
-        file.
-      </p>
-    </BODY>
-  </STYLEPOINT>
-
-  <STYLEPOINT title="Boolean Expressions">
-    <SUMMARY>
-      When you have a boolean expression that is longer than the <a href="#Line_Length">standard line length</a>, be consistent in
-      how you break up the lines.
-    </SUMMARY>
-    <BODY>
-      <p>
-        In this example, the logical AND operator is always at the end
-        of the lines:
-      </p>
-      <CODE_SNIPPET>
-        if (thisOneThing &gt; thisOtherThing &amp;&amp;
-            aThirdThing == aFourthThing &amp;&amp;
-            yetAnother &amp;&amp; lastOne)
-        {
-          ...
-        }
-      </CODE_SNIPPET>
-      <p>
-        Note that when the code wraps in this example, both of
-        the <code>&amp;&amp;</code> logical AND operators are at the
-        end of the line.  This is more common in Google code, though
-        wrapping all operators at the beginning of the line is also
-        allowed.  Feel free to insert extra parentheses judiciously,
-        because they can be very helpful in increasing readability
-        when used appropriately.  Also note that you should always use the
-        punctuation operators, such as <code>&amp;&amp;</code> and
-        <code>~</code>, rather than the word operators, such as <code>and</code>
-        and <code>compl</code>.
-      </p>
-    </BODY>
-  </STYLEPOINT>
-
-  <STYLEPOINT title="Return Values">
-    <SUMMARY>
-      Do not needlessly surround the <code>return</code> expression with
-      parentheses.
-    </SUMMARY>
-    <BODY>
-      <p>
-        Use parentheses in <code>return expr;</code> only where you would use
-        them in <code>x = expr;</code>.
-      </p>
-      <CODE_SNIPPET>
-        return result;                  // No parentheses in the simple case.
-        return (someLongCondition &amp;&amp;  // Parentheses ok to make a complex
-                anotherCondition);     //     expression more readable.
-      </CODE_SNIPPET>
-      <BAD_CODE_SNIPPET>
-        return (value);                // You wouldn't write var = (value);
-        return(result);                // return is not a function!
-      </BAD_CODE_SNIPPET>
-    </BODY>
-  </STYLEPOINT>
-
-  
-
-  <STYLEPOINT title="Variable and Array Initialization">
-    <SUMMARY>
-      Your choice of <code>=</code> or <code>()</code>.
-    </SUMMARY>
-    <BODY>
-      <p>
-        You may choose between <code>=</code> and <code>()</code>; the
-        following are all correct:
-      </p>
-      <CODE_SNIPPET>
-        int x = 3;
-        int x(3);
-        string name("Some Name");
-        string name = "Some Name";
-      </CODE_SNIPPET>
     </BODY>
   </STYLEPOINT>
 
