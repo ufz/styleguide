@@ -4,7 +4,7 @@
 
 
 <p>
-This styleguide is derived from the <a href="http://code.google.com/p/google-styleguide/">Google C++ Style Guide</a> an is hosted on <a href="https://github.com/ufz/styleguide">Github</a>. Some <a href="https://github.com/ufz/styleguide/compare/9df0dce4fa1441f9de7ff99760c61e01b6d3b79c...gh-pages">modifications</a> were made to match the <a href="http://www.opengeosys.net" target="blank">OpenGeoSys</a> development needs. The original authors are listed on the right side.
+This styleguide is derived from the <a href="http://code.google.com/p/google-styleguide/">Google C++ Style Guide</a> and is hosted on <a href="https://github.com/ufz/styleguide">Github</a>. Some <a href="https://github.com/ufz/styleguide/compare/9df0dce4fa1441f9de7ff99760c61e01b6d3b79c...gh-pages">modifications</a> were made to match the <a href="http://www.opengeosys.net" target="blank">OpenGeoSys</a> development needs. The original authors are listed on the right side.
 </p>
 
 <p align="right">
@@ -52,7 +52,7 @@ Tashana Landray
   </p>
   <p>
     The goal of this guide is to manage this complexity by describing
-    in detail the dos and don'ts of writing C++
+    in detail the dos and dont's of writing C++
     code. These rules exist to
     keep
     
@@ -111,7 +111,7 @@ Tashana Landray
     <code>.h</code> file. There are some common exceptions, such as
     
     unittests
-    and small <code>.cc</code> files containing just a <code>main()</code>
+    and small <code>.cpp</code> files containing just a <code>main()</code>
     function.
   </p>
   <p>
@@ -210,7 +210,7 @@ Tashana Landray
         in header files.
       </p>
       <p>
-        Of course, <code>.cc</code> files typically do require the
+        Of course, <code>.cpp</code> files typically do require the
         definitions of the classes they use, and usually have to
         include several header files.
       </p>
@@ -221,9 +221,9 @@ Tashana Landray
         either via an #include or via a forward declaration.  Do not
         depend on the symbol being brought in transitively via headers
         not directly included.  One exception is if <code>Foo</code>
-        is used in <code>myfile.cc</code>, it's ok to #include (or
+        is used in <code>myfile.cpp</code>, it's ok to #include (or
         forward-declare) <code>Foo</code> in <code>myfile.h</code>,
-        instead of <code>myfile.cc</code>.
+        instead of <code>myfile.cpp</code>.
       </SUBSECTION>
     </BODY>
   </STYLEPOINT>
@@ -291,7 +291,7 @@ Tashana Landray
         The definition of an inline function needs to be in a header
         file, so that the compiler has the definition available for
         inlining at the call sites.  However, implementation code
-        properly belongs in <code>.cc</code> files, and we do not like
+        properly belongs in <code>.cpp</code> files, and we do not like
         to have much actual code in <code>.h</code> files unless there
         is a readability or performance advantage.
       </p>
@@ -362,26 +362,20 @@ Tashana Landray
       <p>
         
         All of a project's header files should be
-        listed as descendants of the project's source directory
-        without use of UNIX directory shortcuts <code>.</code> (the current
-        directory) or <code>..</code> (the parent directory).  For
-        example,
+        listed as only the filename itself.
         
-        <code>google-awesome-project/src/base/logging.h</code>
+        <code>Logging.h</code>
         should be included as
       </p>
       <CODE_SNIPPET>
-        #include "base/logging.h"
+        #include "Logging.h"
       </CODE_SNIPPET>
       <p>
-        In <code><var>dir/foo</var>.cc</code> or <code><var>dir/foo_test</var>.cc</code>,
-	whose main purpose is to implement or test the stuff in
-        <code><var>dir2/foo2</var>.h</code>, order your includes as
+        In <code><var>Foo</var>.cpp</code> order your includes as
         follows:
       </p>
       <ol>
-        <li> <code><var>dir2/foo2</var>.h</code> (preferred location
-          &#8212; see details below).</li>
+        <li> <code><var>Foo</var>.h</code></li>
         <li> C system files.</li>
         <li> C++ system files.</li>
         <li> Other libraries' <code>.h</code> files.</li>
@@ -394,14 +388,7 @@ Tashana Landray
         every header file to be compilable on its own.  The easiest
         way to achieve this is to make sure that every one of them is
         the first <code>.h</code> file <code>#include</code>d in some
-        <code>.cc</code>.  
-      </p>
-      <p>
-        <code><var>dir/foo</var>.cc</code> and
-        <code><var>dir2/foo2</var>.h</code> are often in the same
-        directory (e.g. <code>base/basictypes_test.cc</code> and
-        <code>base/basictypes.h</code>), but can be in different
-        directories too.
+        <code>.cpp</code>.  
       </p>
       
       <p>
@@ -411,11 +398,11 @@ Tashana Landray
       <p>
         For example, the includes in
         
-        <code>google-awesome-project/src/foo/internal/fooserver.cc</code>
+        <code>Fooserver.cpp</code>
         might look like this:
       </p>
       <CODE_SNIPPET>
-        #include "foo/public/fooserver.h"  // Preferred location.
+        #include "Fooserver.h"
 
         #include &lt;sys/types.h&gt;
         #include &lt;unistd.h&gt;
@@ -423,9 +410,9 @@ Tashana Landray
         #include &lt;hash_map&gt;
         #include &lt;vector&gt;
 
-        #include "base/basictypes.h"
-        #include "base/commandlineflags.h"
-        #include "foo/public/bar.h"
+        #include "Basictypes.h"
+        #include "CommandlineFlags.h"
+        #include "Bar.h"
       </CODE_SNIPPET>
     </BODY>
   </STYLEPOINT>
@@ -434,7 +421,7 @@ Tashana Landray
 <CATEGORY title="Scoping">
   <STYLEPOINT title="Namespaces">
     <SUMMARY>
-      Unnamed namespaces in <code>.cc</code> files are encouraged.  With
+      Unnamed namespaces in <code>.cpp</code> files are encouraged.  With
       named namespaces, choose the name based on the
       
       project, and possibly its path.
@@ -480,11 +467,12 @@ Tashana Landray
         <SUBSECTION title="Unnamed Namespaces">
           <ul>
             <li> Unnamed namespaces are allowed and even encouraged in
-                 <code>.cc</code> files, to avoid runtime naming
+                 <code>.cpp</code> files, to avoid runtime naming
                  conflicts:
                  <CODE_SNIPPET>
-                   namespace {                           // This is in a .cc file.
-
+                   namespace                           // This is in a .cpp file.
+                   {
+                   
                    // The content of a namespace is not indented
                    enum { kUnused, kEOF, kError };       // Commonly used tokens.
                    bool AtEof() { return pos_ == kEOF; }  // Uses our namespace's EOF.
@@ -520,31 +508,35 @@ Tashana Landray
                  from other namespaces:
                  <CODE_SNIPPET>
                    // In the .h file
-                   namespace mynamespace {
+                   namespace mynamespace
+                   {
 
                    // All declarations are within the namespace scope.
                    // Notice the lack of indentation.
-                   class MyClass {
-                    public:
+                   class MyClass
+                   {
+                   public:
                      ...
-                     void Foo();
+                     void foo();
                    };
 
                    }  // namespace mynamespace
                  </CODE_SNIPPET>
                  <CODE_SNIPPET>
-                   // In the .cc file
-                   namespace mynamespace {
+                   // In the .cpp file
+                   namespace mynamespace
+                   {
 
                    // Definition of functions is within scope of the namespace.
-                   void MyClass::Foo() {
+                   void MyClass::foo()
+                   {
                      ...
                    }
 
                    }  // namespace mynamespace
                  </CODE_SNIPPET>
                  <p>
-                   The typical <code>.cc</code> file might have more
+                   The typical <code>.cpp</code> file might have more
                    complex detail, including the need to reference classes
                    in other namespaces.
                  </p>
@@ -556,7 +548,8 @@ Tashana Landray
                    class C;  // Forward declaration of class C in the global namespace.
                    namespace a { class A; }  // Forward declaration of a::A.
 
-                   namespace b {
+                   namespace b
+                   {
 
                    ...code for b...         // Code goes against the left margin.
 
@@ -584,21 +577,21 @@ Tashana Landray
                  </li>
 
             <li> You may use a <SYNTAX>using-declaration</SYNTAX>
-                 anywhere in a <code>.cc</code> file, and in functions,
+                 anywhere in a <code>.cpp</code> file, and in functions,
                  methods or classes in <code>.h</code> files.
                  <CODE_SNIPPET>
-                   // OK in .cc files.
+                   // OK in .cpp files.
                    // Must be in a function, method or class in .h files.
                    using ::foo::bar;
                  </CODE_SNIPPET>
                  </li>
 
             <li> Namespace aliases are allowed anywhere in a
-                 <code>.cc</code> file, anywhere inside the named
+                 <code>.cpp</code> file, anywhere inside the named
                  namespace that wraps an entire <code>.h</code> file,
                  and in functions and methods.
                  <CODE_SNIPPET>
-                   // Shorten access to some commonly used names in .cc files.
+                   // Shorten access to some commonly used names in .cpp files.
                    namespace fbz = ::foo::bar::baz;
 
                    // Shorten access to some commonly used names (in a .h file).
@@ -609,7 +602,8 @@ Tashana Landray
                    // within a project.
                    namespace pd_s = ::pipeline_diagnostics::sidetable;
 
-                   inline void my_inline_function() {
+                   inline void my_inline_function()
+                   {
                      // namespace alias local to a function (or method).
                      namespace fbz = ::foo::bar::baz;
                      ...
@@ -647,11 +641,13 @@ Tashana Landray
         A class can define another class within it; this is also
         called a <SYNTAX>member class</SYNTAX>.
         <CODE_SNIPPET>
-          class Foo {
+          class Foo
+          {
 
-           private:
+          private:
             // Bar is a member class, nested within Foo.
-            class Bar {
+            class Bar
+            {
               ...
             };
 
@@ -664,7 +660,7 @@ Tashana Landray
         enclosing class scope rather than polluting the outer scope
         with the class name.  Nested classes can be forward declared
         within the enclosing class and then defined in the
-        <code>.cc</code> file to avoid including the nested class
+        <code>.cpp</code> file to avoid including the nested class
         definition in the enclosing class declaration, since the
         nested class definition is usually only relevant to the
         implementation.
@@ -773,7 +769,7 @@ Tashana Landray
         // Inefficient implementation:
         for (int i = 0; i &lt; 1000000; ++i) {
           Foo f;  // My ctor and dtor get called 1000000 times each.
-          f.DoSomething(i);
+          f.doSomething(i);
         }
       </BAD_CODE_SNIPPET>
       <p>
@@ -783,7 +779,7 @@ Tashana Landray
       <CODE_SNIPPET>
         Foo f;  // My ctor and dtor get called once each.
         for (int i = 0; i &lt; 1000000; ++i) {
-          f.DoSomething(i);
+          f.doSomething(i);
         }
       </CODE_SNIPPET>
     </BODY>
@@ -1425,7 +1421,7 @@ Tashana Landray
         should be the last thing in the class. See <a HREF="#Copy_Constructors">Copy Constructors</a>.
       </p>
       <p>
-        Method definitions in the corresponding <code>.cc</code> file
+        Method definitions in the corresponding <code>.cpp</code> file
         should be the same as the declaration order, as much as possible.
       </p>
       <p>
@@ -1470,6 +1466,7 @@ Tashana Landray
   </STYLEPOINT>
 </CATEGORY>
 
+<!--
 <CATEGORY title="Google-Specific Magic">
   
   <p>
@@ -1554,6 +1551,7 @@ Tashana Landray
 
   
 </CATEGORY>
+-->
 
 <CATEGORY title="Other C++ Features">
   <STYLEPOINT title="Reference Arguments">
@@ -3087,8 +3085,7 @@ Tashana Landray
 
   <STYLEPOINT title="Comment Style">
     <SUMMARY>
-      Use either the <code>//</code> or <code>/* */</code> syntax, as long
-      as you are consistent.
+      For comments inside the implementation use either the <code>//</code> or <code>/* */</code> syntax, as long as you are consistent. For header file comments use <a href="http://www.stack.nl/~dimitri/doxygen/" target="blank">Doxygen</a> <code>///</code> or <code>/** */</code> comments. Additional information like a brief description or function parameter description can be added inside Doxygen comments with backslashed or @-prefixed keywords like <code>/// \brief</code> or <code>/// @see</code>.
     </SUMMARY>
     <BODY>
       <p>
@@ -3129,6 +3126,15 @@ Tashana Landray
           has questions about the file and needs to know whom to contact
           about it.
         </p>
+        
+        <CODE_SNIPPET>
+          /**
+           * \file MyHeaderFile.h
+           * A brief description of this file.
+           * A more elaborate file description (optinal).
+           *
+           * 2011-03-04 LB Initial definition
+           */
       </SUBSECTION>
 
       <SUBSECTION title="File Contents">
@@ -3139,18 +3145,18 @@ Tashana Landray
         <p>
           Generally a <code>.h</code> file will describe the classes
           that are declared in the file with an overview of what they
-          are for and how they are used. A <code>.cc</code> file
+          are for and how they are used. A <code>.cpp</code> file
           should contain more information about implementation details
           or discussions of tricky algorithms. If you feel the
           implementation details or a discussion of the algorithms
           would be useful for someone reading the <code>.h</code>,
           feel free to put it there instead, but mention in the
-          <code>.cc</code> that the documentation is in the
+          <code>.cpp</code> that the documentation is in the
           <code>.h</code> file.
         </p>
         <p>
           Do not duplicate comments in both the <code>.h</code> and
-          the <code>.cc</code>. Duplicated comments diverge.
+          the <code>.cpp</code>. Duplicated comments diverge.
         </p>
       </SUBSECTION>
     </BODY>
@@ -3163,13 +3169,17 @@ Tashana Landray
     </SUMMARY>
     <BODY>
       <CODE_SNIPPET>
-        // Iterates over the contents of a GargantuanTable.  Sample usage:
-        //    GargantuanTableIterator* iter = table-&gt;NewIterator();
-        //    for (iter-&gt;Seek("foo"); !iter-&gt;done(); iter-&gt;Next()) {
-        //      process(iter-&gt;key(), iter-&gt;value());
-        //    }
-        //    delete iter;
-        class GargantuanTableIterator {
+        /** Iterates over the contents of a GargantuanTable.  Sample usage:
+         *  \code
+         *    GargantuanTableIterator* iter = table-&gt;NewIterator();
+         *    for (iter-&gt;Seek("foo"); !iter-&gt;done(); iter-&gt;Next()) {
+         *      process(iter-&gt;key(), iter-&gt;value());
+         *    }
+         *    delete iter;
+         *  \endcode
+         */
+        class GargantuanTableIterator
+        {
           ...
         };
       </CODE_SNIPPET>
@@ -3233,20 +3243,23 @@ Tashana Landray
           Here is an example:
         </p>
         <CODE_SNIPPET>
-          // Returns an iterator for this table.  It is the client's
-          // responsibility to delete the iterator when it is done with it,
-          // and it must not use the iterator once the GargantuanTable object
-          // on which the iterator was created has been deleted.
-          //
-          // The iterator is initially positioned at the beginning of the table.
-          //
-          // This method is equivalent to:
-          //    Iterator* iter = table-&gt;NewIterator();
-          //    iter-&gt;Seek("");
-          //    return iter;
-          // If you are going to immediately seek to another place in the
-          // returned iterator, it will be faster to use NewIterator()
-          // and avoid the extra seek.
+          /** Returns an iterator for this table.  It is the client's
+           *  responsibility to delete the iterator when it is done with it,
+           *  and it must not use the iterator once the GargantuanTable object
+           *  on which the iterator was created has been deleted.
+           *  
+           *  The iterator is initially positioned at the beginning of the table.
+           *  
+           *  This method is equivalent to:
+           *  \code
+           *     Iterator* iter = table-&gt;NewIterator();
+           *     iter-&gt;Seek("");
+           *     return iter;
+           *  \endcode
+           *  If you are going to immediately seek to another place in the
+           *  returned iterator, it will be faster to use NewIterator()
+           *  and avoid the extra seek.
+           */
           Iterator* GetIterator() const;
         </CODE_SNIPPET>
         <p>
@@ -3255,7 +3268,7 @@ Tashana Landray
           to say "returns false otherwise" because this is implied.
         </p>
         <CODE_SNIPPET>
-          // Returns true if the table cannot hold any more entries.
+          /// \brief Returns true if the table cannot hold any more entries.
           bool IsTableFull();
         </CODE_SNIPPET>
         <p>
@@ -3309,13 +3322,14 @@ Tashana Landray
         </p>
         <CODE_SNIPPET>
           private:
-           // Keeps track of the total number of entries in the table.
-           // Used to ensure we do not go over the limit. -1 means
-           // that we don't yet know how many entries the table has.
-           int num_total_entries_;
+           /// \brief Keeps track of the total number of entries in the table.
+           /// Used to ensure we do not go over the limit. -1 means
+           /// that we don't yet know how many entries the table has.
+           int _numTotalEntries;
         </CODE_SNIPPET>
       </SUBSECTION>
 
+      <!--
       <SUBSECTION title="Global Variables">
         <p>
           As with data members, all global variables should have a
@@ -3327,6 +3341,7 @@ Tashana Landray
           const int kNumTestCases = 6;
         </CODE_SNIPPET>
       </SUBSECTION>
+      -->
     </BODY>
   </STYLEPOINT>
 
@@ -3359,8 +3374,8 @@ Tashana Landray
         </p>
         <CODE_SNIPPET>
           // If we have enough memory, mmap the data portion too.
-          mmap_budget = max&lt;int64&gt;(0, mmap_budget - index_-&gt;length());
-          if (mmap_budget &gt;= data_size_ &amp;&amp; !MmapData(mmap_chunk_bytes, mlock))
+          mmapBudget = max&lt;int64&gt;(0, mmapBudget - _index-&gt;length());
+          if (mmapBudget &gt;= _dataSize &amp;&amp; !MmapData(mmapChunkBytes, mlock))
             return;  // Error already logged.
         </CODE_SNIPPET>
         <p>
@@ -3373,12 +3388,12 @@ Tashana Landray
           often be more readable to line them up:
         </p>
         <CODE_SNIPPET>
-          DoSomething();                  // Comment here so the comments line up.
-          DoSomethingElseThatIsLonger();  // Comment here so there are two spaces between
+          doSomething();                  // Comment here so the comments line up.
+          doSomethingElseThatIsLonger();  // Comment here so there are two spaces between
                                           // the code and the comment.
           { // One space before comment when opening a new scope is allowed,
             // thus the comment lines up with the following comments and code.
-            DoSomethingElse();  // Two spaces before line comments normally.
+            doSomethingElse();  // Two spaces before line comments normally.
           }
         </CODE_SNIPPET>
       </SUBSECTION>
@@ -3390,7 +3405,7 @@ Tashana Landray
           constants. For example, compare:
         </p>
         <BAD_CODE_SNIPPET>
-          bool success = CalculateSomething(interesting_value,
+          bool success = calculateSomething(interestingValue,
                                             10,
                                             false,
                                             NULL);  // What are these arguments??
@@ -3399,11 +3414,12 @@ Tashana Landray
           versus:
         </p>
         <CODE_SNIPPET>
-          bool success = CalculateSomething(interesting_value,
+          bool success = calculateSomething(interestingValue,
                                             10,     // Default base value.
                                             false,  // Not the first time we're calling this.
                                             NULL);  // No callback.
         </CODE_SNIPPET>
+        <!--
         <p>
           Or alternatively, constants or self-describing variables:
         </p>
@@ -3416,9 +3432,10 @@ Tashana Landray
                                             kFirstTimeCalling,
                                             null_callback);
         </CODE_SNIPPET>
+        -->
       </SUBSECTION>
 
-      <SUBSECTION title="Don'ts">
+      <SUBSECTION title="Dont's">
         <p>
           Note that you should <em>never</em> describe the code
           itself. Assume that the person reading the code knows C++
@@ -3550,11 +3567,12 @@ Tashana Landray
     they
     can all read and understand everyone's code easily.
   </p>
-  
+  <!--
   <p>
     To help you format code correctly, we've created a <A HREF="http://google-styleguide.googlecode.com/svn/trunk/google-c-style.el">settings
     file for emacs</A>.
   </p>
+  -->
 
   <STYLEPOINT title="Line Length">
     <SUMMARY>
@@ -3651,6 +3669,32 @@ Tashana Landray
       </p>
     </BODY>
   </STYLEPOINT>
+  
+  <STYLEPOINT title="Indenting">
+    <SUMMARY>
+      Use <a href="http://en.wikipedia.org/wiki/Indent_style#Allman_style">Allman style</a>
+      for bracket indenting. This style puts the brace associated with
+      a control statement on the next line, indented to the same level
+      as the control statement. Statements within the braces are indented
+      to the next level.
+    </SUMMARY>
+    <BODY>
+      <p>
+        Advantages of this style are that the indented code is clearly
+        set apart from the containing statement by lines that are almost
+        completely whitespace, improving readability, and the closing brace
+        lines up in the same column as the opening brace, making it easy to
+        find matching braces
+      </p>
+      <CODE_SNIPPET>
+        if (x == y)
+        {
+            doSomething();
+            doSomethingElse();
+        }
+      </CODE_SNIPPET>
+    </BODY>
+  </STYLEPOINT>
 
   <STYLEPOINT title="Function Declarations and Definitions">
     <SUMMARY>
@@ -3662,8 +3706,8 @@ Tashana Landray
         Functions look like this:
       </p>
       <CODE_SNIPPET>
-        ReturnType ClassName::FunctionName(Type par_name1, Type par_name2) {
-          DoSomething();
+        ReturnType ClassName::functionName(Type parName1, Type parName2) {
+          doSomething();
           ...
         }
       </CODE_SNIPPET>
@@ -3671,9 +3715,9 @@ Tashana Landray
         If you have too much text to fit on one line:
       </p>
       <CODE_SNIPPET>
-        ReturnType ClassName::ReallyLongFunctionName(Type par_name1, Type par_name2,
-                                                     Type par_name3) {
-          DoSomething();
+        ReturnType ClassName::reallyLongFunctionName(Type parName1, Type parName2,
+                                                     Type parName3) {
+          doSomething();
           ...
         }
       </CODE_SNIPPET>
@@ -3681,11 +3725,11 @@ Tashana Landray
         or if you cannot fit even the first parameter:
       </p>
       <CODE_SNIPPET>
-        ReturnType LongClassName::ReallyReallyReallyLongFunctionName(
-            Type par_name1,  // 4 space indent
-            Type par_name2,
-            Type par_name3) {
-          DoSomething();  // 2 space indent
+        ReturnType LongClassName::reallyReallyReallyLongFunctionName(
+            Type parName1,  // 4 space indent
+            Type parName2,
+            Type parName3) {
+          doSomething();  // 2 space indent
           ...
         }
       </CODE_SNIPPET>
@@ -3731,14 +3775,16 @@ Tashana Landray
       </p>
       <CODE_SNIPPET>
         // Everything in this function signature fits on a single line
-        ReturnType FunctionName(Type par) const {
+        ReturnType functionName(Type par) const
+        {
           ...
         }
 
         // This function signature requires multiple lines, but
         // the const keyword is on the line with the last parameter.
-        ReturnType ReallyLongFunctionName(Type par1,
-                                          Type par2) const {
+        ReturnType reallyLongFunctionName(Type par1,
+                                          Type par2) const
+        {
           ...
         }
       </CODE_SNIPPET>
@@ -3748,24 +3794,26 @@ Tashana Landray
       </p>
       <CODE_SNIPPET>
         // Always have named parameters in interfaces.
-        class Shape {
+        class Shape
+        {
          public:
-          virtual void Rotate(double radians) = 0;
+          virtual void rotate(double radians) = 0;
         }
 
         // Always have named parameters in the declaration.
-        class Circle : public Shape {
+        class Circle : public Shape
+        {
          public:
-          virtual void Rotate(double radians);
+          virtual void rotate(double radians);
         }
 
         // Comment out unused named parameters in definitions.
-        void Circle::Rotate(double /*radians*/) {}
+        void Circle::rotate(double /*radians*/) {}
       </CODE_SNIPPET>
       <BAD_CODE_SNIPPET>
         // Bad - if someone wants to implement later, it's not clear what the
         // variable means.
-        void Circle::Rotate(double) {}
+        void Circle::rotate(double) {}
       </BAD_CODE_SNIPPET>
     </BODY>
   </STYLEPOINT>
@@ -3780,7 +3828,7 @@ Tashana Landray
         Function calls have the following format:
       </p>
       <CODE_SNIPPET>
-        bool retval = DoSomething(argument1, argument2, argument3);
+        bool retval = doSomething(argument1, argument2, argument3);
       </CODE_SNIPPET>
       <p>
         If the arguments do not all fit on one line, they should be
@@ -3789,7 +3837,7 @@ Tashana Landray
         open paren or before the close paren:
       </p>
       <CODE_SNIPPET>
-        bool retval = DoSomething(averyveryveryverylongargument1,
+        bool retval = doSomething(averyveryveryverylongargument1,
                                   argument2, argument3);
       </CODE_SNIPPET>
       <p>
@@ -3797,7 +3845,7 @@ Tashana Landray
         line if this makes the code more readable:
       </p>
       <CODE_SNIPPET>
-        bool retval = DoSomething(argument1,
+        bool retval = doSomething(argument1,
                                   argument2,
                                   argument3,
                                   argument4);
@@ -3808,12 +3856,14 @@ Tashana Landray
         place all arguments on subsequent lines:
       </p>
       <CODE_SNIPPET>
-        if (...) {
+        if (...)
+        {
           ...
           ...
-          if (...) {
-            DoSomethingThatRequiresALongFunctionName(
-                very_long_argument1,  // 4 space indent
+          if (...)
+          {
+            doSomethingThatRequiresALongFunctionName(
+                veryLongArgument1,  // 4 space indent
                 argument2,
                 argument3,
                 argument4);
@@ -3842,9 +3892,12 @@ Tashana Landray
         do not add the spaces.
       </p>
       <CODE_SNIPPET>
-        if (condition) {  // no spaces inside parentheses
+        if (condition) // no spaces inside parentheses
+        {
           ...  // 2 space indent.
-        } else {  // The else goes on the same line as the closing brace.
+        }
+        else
+        {
           ...
         }
       </CODE_SNIPPET>
@@ -3853,25 +3906,24 @@ Tashana Landray
         parentheses:
       </p>
       <CODE_SNIPPET>
-        if ( condition ) {  // spaces inside parentheses - rare
+        if ( condition ) // spaces inside parentheses - rare
+        {
           ...  // 2 space indent.
-        } else {  // The else goes on the same line as the closing brace.
+        }
+        else
+        {
           ...
         }
       </CODE_SNIPPET>
       <p>
         Note that in all cases you must have a space between the
-        <code>if</code> and the open parenthesis.  You must also have
-        a space between the close parenthesis and the curly brace, if
-        you're using one.
+        <code>if</code> and the open parenthesis.
       </p>
       <BAD_CODE_SNIPPET>
         if(condition)     // Bad - space missing after IF.
-        if (condition){   // Bad - space missing before {.
-        if(condition){    // Doubly bad.
       </BAD_CODE_SNIPPET>
       <CODE_SNIPPET>
-        if (condition) {  // Good - proper space after IF and before {.
+        if (condition)  // Good - proper space after IF.
       </CODE_SNIPPET>
       <p>
         Short conditional statements may be written on one line if
@@ -3889,8 +3941,8 @@ Tashana Landray
       </p>
       <BAD_CODE_SNIPPET>
         // Not allowed - IF statement on one line when there is an ELSE clause
-        if (x) DoThis();
-        else DoThat();
+        if (x) doThis();
+        else doThat();
       </BAD_CODE_SNIPPET>
       <p>
         In general, curly braces are not required for single-line
@@ -3904,10 +3956,11 @@ Tashana Landray
       </p>
       <CODE_SNIPPET>
         if (condition)
-          DoSomething();  // 2 space indent.
+          doSomething();  // 2 space indent.
 
-        if (condition) {
-          DoSomething();  // 2 space indent.
+        if (condition)
+        {
+          doSomething();  // 2 space indent.
         }
       </CODE_SNIPPET>
       <p>
@@ -3916,24 +3969,30 @@ Tashana Landray
       </p>
       <BAD_CODE_SNIPPET>
         // Not allowed - curly on IF but not ELSE
-        if (condition) {
+        if (condition)
+        {
           foo;
-        } else
+        }
+        else
           bar;
 
         // Not allowed - curly on ELSE but not IF
         if (condition)
           foo;
-        else {
+        else
+        {
           bar;
         }
       </BAD_CODE_SNIPPET>
       <CODE_SNIPPET>
         // Curly braces around both IF and ELSE required because
         // one of the clauses used braces.
-        if (condition) {
+        if (condition)
+        {
           foo;
-        } else {
+        }
+        else
+        {
           bar;
         }
       </CODE_SNIPPET>
@@ -3961,16 +4020,20 @@ Tashana Landray
       </p>
       
       <CODE_SNIPPET>
-        switch (var) {
-          case 0: {  // 2 space indent
-            ...      // 4 space indent
-            break;
-          }
-          case 1: {
+        switch (var)
+        {
+          case 0:
+          { 
             ...
             break;
           }
-          default: {
+          case 1:
+          {
+            ...
+            break;
+          }
+          default:
+          {
             assert(false);
           }
         }
@@ -3980,7 +4043,8 @@ Tashana Landray
         <code>continue</code>, but not a single semicolon.
       </p>
       <CODE_SNIPPET>
-        while (condition) {
+        while (condition)
+        {
           // Repeat test until it returns false.
         }
         for (int i = 0; i &lt; kSomeNumber; ++i) {}  // Good - empty body.
@@ -4057,9 +4121,10 @@ Tashana Landray
         of the lines:
       </p>
       <CODE_SNIPPET>
-        if (this_one_thing &gt; this_other_thing &amp;&amp;
-            a_third_thing == a_fourth_thing &amp;&amp;
-            yet_another &amp;&amp; last_one) {
+        if (thisOneThing &gt; thisOtherThing &amp;&amp;
+            aThirdThing == aFourthThing &amp;&amp;
+            yetAnother &amp;&amp; lastOne)
+        {
           ...
         }
       </CODE_SNIPPET>
@@ -4090,8 +4155,8 @@ Tashana Landray
       </p>
       <CODE_SNIPPET>
         return result;                  // No parentheses in the simple case.
-        return (some_long_condition &amp;&amp;  // Parentheses ok to make a complex
-                another_condition);     //     expression more readable.
+        return (someLongCondition &amp;&amp;  // Parentheses ok to make a complex
+                anotherCondition);     //     expression more readable.
       </CODE_SNIPPET>
       <BAD_CODE_SNIPPET>
         return (value);                // You wouldn't write var = (value);
@@ -4133,23 +4198,23 @@ Tashana Landray
       </p>
       <CODE_SNIPPET>
         // Good - directives at beginning of line
-          if (lopsided_score) {
+          if (lopsidedScore) {
         #if DISASTER_PENDING      // Correct -- Starts at beginning of line
-            DropEverything();
+            dropEverything();
         # if NOTIFY               // OK but not required -- Spaces after #
-            NotifyClient();
+            notifyClient();
         # endif
         #endif
-            BackToNormal();
+            backToNormal();
           }
       </CODE_SNIPPET>
       <BAD_CODE_SNIPPET>
         // Bad - indented directives
-          if (lopsided_score) {
+          if (lopsidedScore) {
             #if DISASTER_PENDING  // Wrong!  The "#if" should be at beginning of line
-            DropEverything();
+            dropEverything();
             #endif                // Wrong!  Do not indent "#endif"
-            BackToNormal();
+            backToNormal();
           }
       </BAD_CODE_SNIPPET>
     </BODY>
@@ -4158,7 +4223,7 @@ Tashana Landray
   <STYLEPOINT title="Class Format">
     <SUMMARY>
       Sections in <code>public</code>, <code>protected</code> and
-      <code>private</code> order, each indented one space.
+      <code>private</code> order.
     </SUMMARY>
     <BODY>
       <p>
@@ -4167,24 +4232,25 @@ Tashana Landray
         a discussion of what comments are needed) is:
       </p>
       <CODE_SNIPPET>
-        class MyClass : public OtherClass {
-         public:      // Note the 1 space indent!
+        class MyClass : public OtherClass
+        {
+        public:
           MyClass();  // Regular 2 space indent.
           explicit MyClass(int var);
           ~MyClass() {}
 
-          void SomeFunction();
-          void SomeFunctionThatDoesNothing() {
+          void someFunction();
+          void someFunctionThatDoesNothing() {
           }
 
-          void set_some_var(int var) { some_var_ = var; }
-          int some_var() const { return some_var_; }
+          void setSomeVar(int var) { _someVar = var; }
+          int getSomeVar() const { return _someVar; }
 
          private:
-          bool SomeInternalFunction();
+          bool someInternalFunction();
 
-          int some_var_;
-          int some_other_var_;
+          int _someVar;
+          int _someOtherVar;
           DISALLOW_COPY_AND_ASSIGN(MyClass);
         };
       </CODE_SNIPPET>
@@ -4196,18 +4262,19 @@ Tashana Landray
              subclass name, subject to the 80-column limit.
              </li>
         <li> The <code>public:</code>, <code>protected:</code>, and
-             <code>private:</code> keywords should be indented one
-             space.
+             <code>private:</code> keywords should be not indented.
              </li>
         <li> Except for the first instance, these keywords should be preceded
              by a blank line. This rule is optional in small classes.
-             </li>
-        <li> Do not leave a blank line after these keywords.
              </li>
         <li> The <code>public</code> section should be first, followed by
              the <code>protected</code> and finally the
              <code>private</code> section.
              </li>
+        <li> When using Qt slot definitions should follow the corresponding
+             section. So <code>public slots:</code> should follow
+             <code>public</code>. The signal definition <code>signals:</code>
+             should be placed at the end.
         <li> See <a HREF="#Declaration_Order">Declaration Order</a> for
              rules on ordering declarations within each of these sections.
              </li>
@@ -4226,19 +4293,20 @@ Tashana Landray
       </p>
       <CODE_SNIPPET>
         // When it all fits on one line:
-        MyClass::MyClass(int var) : some_var_(var), some_other_var_(var + 1) {}
+        MyClass::MyClass(int var) : _someVar(var), _someOtherVar(var + 1) {}
       </CODE_SNIPPET>
       <p>
         or
       </p>
       <CODE_SNIPPET>
-        // When it requires multiple lines, indent 4 spaces, putting the colon on
+        // When it requires multiple lines put the colon on
         // the first initializer line:
         MyClass::MyClass(int var)
-            : some_var_(var),             // 4 space indent
-              some_other_var_(var + 1) {  // lined up
+        : some_var_(var),
+          some_other_var_(var + 1) // lined up
+        {
           ...
-          DoSomething();
+          doSomething();
           ...
         }
       </CODE_SNIPPET>
@@ -4304,8 +4372,8 @@ Tashana Landray
          public:
           // For inline function implementations, put spaces between the braces
           // and the implementation itself.
-          Foo(int b) : Bar(), baz_(b) {}  // No spaces inside empty braces.
-          void Reset() { baz_ = 0; }  // Spaces separating braces from implementation.
+          Foo(int b) : Bar(), _baz(b) {}  // No spaces inside empty braces.
+          void reset() { _baz = 0; }  // Spaces separating braces from implementation.
           ...
         </CODE_SNIPPET>
         <p>
@@ -4321,19 +4389,17 @@ Tashana Landray
       </SUBSECTION>
       <SUBSECTION title="Loops and Conditionals">
         <CODE_SNIPPET>
-        if (b) {          // Space after the keyword in conditions and loops.
-        } else {          // Spaces around else.
-        }
         while (test) {}   // There is usually no space inside parentheses.
-        switch (i) {
-        for (int i = 0; i &lt; 5; ++i) {
-        switch ( i ) {    // Loops and conditions may have spaces inside
-        if ( test ) {     // parentheses, but this is rare.  Be consistent.
-        for ( int i = 0; i &lt; 5; ++i ) {
-        for ( ; i &lt; 5 ; ++i) {  // For loops always have a space after the
-          ...                   // semicolon, and may have a space before the
-                                // semicolon.
-        switch (i) {
+        switch (i)
+        for (int i = 0; i &lt; 5; ++i)
+        switch ( i )    // Loops and conditions may have spaces inside
+        if ( test )     // parentheses, but this is rare.  Be consistent.
+        for ( int i = 0; i &lt; 5; ++i )
+        for ( ; i &lt; 5 ; ++i)  // For loops always have a space after the
+          ...                    // semicolon, and may have a space before the
+                                 // semicolon.
+        switch (i)
+        {
           case 1:         // No space before colon in a switch case.
             ...
           case 2: break;  // Use a space after a colon if there's code after it.
@@ -4432,7 +4498,7 @@ Tashana Landray
   </STYLEPOINT>
 
   
-
+  <!--
   <STYLEPOINT title="Windows Code">
     <SUMMARY>
       
@@ -4450,7 +4516,7 @@ Tashana Landray
       <ul>
         <li> Do not use Hungarian notation (for example, naming an
              integer <code>iNum</code>). Use the Google naming conventions,
-             including the <code>.cc</code> extension for source files.
+             including the <code>.cpp</code> extension for source files.
              </li>
         <li> Windows defines many of its own synonyms for primitive
              types, such as <code>DWORD</code>, <code>HANDLE</code>, etc.
@@ -4503,7 +4569,7 @@ Tashana Landray
              typically with a name like <code>StdAfx.h</code> or
              <code>precompile.h</code>. To make your code easier to share
              with other projects, avoid including this file explicitly
-             (except in <code>precompile.cc</code>), and use the
+             (except in <code>precompile.cpp</code>), and use the
              <code>/FI</code> compiler option to include the file
              automatically.
              </li>
@@ -4514,6 +4580,7 @@ Tashana Landray
       </ul>
     </BODY>
   </STYLEPOINT>
+  -->
 
   
 </CATEGORY>
