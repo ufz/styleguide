@@ -4276,6 +4276,7 @@ Tashana Landray
              section. So <code>public slots:</code> should follow
              <code>public</code>. The signal definition <code>signals:</code>
              should be placed at the end.
+             </li>
         <li> See <a HREF="#Declaration_Order">Declaration Order</a> for
              rules on ordering declarations within each of these sections.
              </li>
