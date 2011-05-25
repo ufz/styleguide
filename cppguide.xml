@@ -132,7 +132,7 @@ Tashana Landray
       
       <p>
         Every file in a project should be named unique so it is
-        sufficient to only user the filename. For example, the file
+        sufficient to only use the filename. For example, the file
         <code>Foo.h</code> should
         have the following guard:
       </p>
@@ -173,7 +173,7 @@ Tashana Landray
         of having to <code>#include "MyClass.h"</code>. Note the special
         notation of classes inside namespaces.
       </p>
-      <CODE_SNIPPET> 
+      <CODE_SNIPPET>
         class MyClass;                      // Forward declaration
         namespace MyNamespace { class A; }  // Forward declaration of MyNamespace::A
       </CODE_SNIPPET>
@@ -182,6 +182,9 @@ Tashana Landray
         include "MyClass.h" // Bad include
         include "A.h"       // Bad include
       </BAD_CODE_SNIPPET>
+      <p>
+        Never forward declare somethin the <code>std</code> namespace.
+      </p>
       <p>
         How can we use a class <code>Foo</code> in a header file
         without access to its definition?
@@ -228,6 +231,7 @@ Tashana Landray
   <STYLEPOINT title="Inline Functions">
     <SUMMARY>
       Define functions inline only when they are small, say, 1-2 lines.
+      Trust the compiler in doing optimizations.
     </SUMMARY>
     <BODY>
       <DEFINITION>
@@ -248,12 +252,16 @@ Tashana Landray
         function will usually decrease code size while inlining a very
         large function can dramatically increase code size.  On modern
         processors smaller code usually runs faster due to better use
-        of the instruction cache.
+        of the instruction cache. Also modern compiler do a very good
+        job on optimizing code.
       </CONS>
       <DECISION>
         <p>
-          A decent rule of thumb is to not inline a function if it is
-          more than 10 lines long. Beware of destructors, which are
+          Because of compiler doing optimizations you do not have to
+          care that much about inlining. The compiler often does this
+          for you when useful. Otherwise a decent rule of thumb is to
+          not inline a function if it is
+          more than 2 lines long. Beware of destructors, which are
           often longer than they appear because of implicit member-
           and base-destructor calls!
         </p>
@@ -305,8 +313,7 @@ Tashana Landray
   <STYLEPOINT title="Names and Order of Includes">
     <SUMMARY>
       Use standard order for readability and to avoid hidden
-      dependencies: C library, C++ library,
-      
+      dependencies: (class own header file), C library, C++ library,
       other libraries' <code>.h</code>, your
       project's
       <code>.h</code>.
@@ -416,8 +423,8 @@ Tashana Landray
                    class MyClass
                    {
                    public:
-                     ...
-                     void foo();
+                       ...
+                       void foo();
                    };
 
                    }  // namespace MyNamespace
@@ -430,7 +437,7 @@ Tashana Landray
                    // Definition of functions is within scope of the namespace.
                    void MyClass::foo()
                    {
-                     ...
+                       ...
                    }
 
                    }  // namespace MyNamespace
@@ -497,13 +504,6 @@ Tashana Landray
           to this.  Consider extracting a new class, or placing the
           functions in a namespace possibly in a separate library.
         </p>
-        <p>
-          If you must define a nonmember function and it is only
-          needed in its <code>.cpp</code> file, use an unnamed
-          <a HREF="#Namespaces">namespace</a> or <code>static</code>
-          linkage (eg <code>static int Foo() {...}</code>) to limit
-          its scope.
-        </p>
       </DECISION>
     </BODY>
   </STYLEPOINT>
@@ -560,9 +560,8 @@ Tashana Landray
       </p>
       <CODE_SNIPPET>
         Foo f;  // My ctor and dtor get called once each.
-        for (int i = 0; i &lt; 1000000; ++i) {
-          f.doSomething(i);
-        }
+        for (int i = 0; i &lt; 1000000; ++i)
+            f.doSomething(i);
       </CODE_SNIPPET>
     </BODY>
   </STYLEPOINT>
@@ -616,9 +615,7 @@ Tashana Landray
       <p>
         If you need a static variable of a class type, consider
         initializing a pointer (which will never be freed), from either your
-        main() function or from pthread_once().  Note that this must be a raw
-        pointer, not a "smart" pointer, since the smart pointer's destructor
-        will have the order-of-destructor issue that we are trying to avoid.
+        main() function or from pthread_once().
       </p>
       
       
@@ -796,13 +793,14 @@ Tashana Landray
           Then, in <code>class Foo</code>:
         </p>
         <CODE_SNIPPET>
-          class Foo {
-           public:
-            Foo(int f);
-            ~Foo();
+          class Foo
+          {
+          public:
+              Foo(int f);
+              ~Foo();
 
-           private:
-            DISALLOW_COPY_AND_ASSIGN(Foo);
+          private:
+              DISALLOW_COPY_AND_ASSIGN(Foo);
           };
         </CODE_SNIPPET>
         <p>
@@ -885,9 +883,7 @@ Tashana Landray
       </CONS>
       <DECISION>
         <p>
-          All inheritance should be <code>public</code>.  If you want to
-          do private inheritance, you should be including an instance of
-          the base class as a member instead.
+          All inheritance should be <code>public</code>.
         </p>
         <p>
           Do not overuse implementation inheritance.  Composition is
@@ -923,10 +919,7 @@ Tashana Landray
   <STYLEPOINT title="Multiple Inheritance">
     <SUMMARY>
       Only very rarely is multiple implementation inheritance actually
-      useful.  We allow multiple inheritance only when at most one of
-      the base classes has an implementation; all other base classes
-      must be <A HREF="#Interfaces">pure interface</A> classes tagged
-      with the <code>Interface</code> suffix.
+      useful.
     </SUMMARY>
     <BODY>
       <DEFINITION>
@@ -946,8 +939,8 @@ Tashana Landray
         different, more explicit, and cleaner solution.
       </CONS>
       <DECISION>
-        Multiple inheritance is allowed only when all superclasses, with the
-        possible exception of the first one, are <A HREF="#Interfaces">pure
+        Multiple inheritance is allowed only when most of the superclasses
+        are <A HREF="#Interfaces">pure
         interfaces</A>.  In order to ensure that they remain pure interfaces,
         they must end with the <code>Interface</code> suffix.
         <SUBSECTION title="Note:">
@@ -958,10 +951,30 @@ Tashana Landray
     </BODY>
   </STYLEPOINT>
 
+  <STYLEPOINT title="Abstract classes">
+    <SUMMARY>
+      Classes that have at least one pure virtual method should be prefixed by
+      <code>Abstract</code>.
+    </SUMMARY>
+    <BODY>
+      <DEFINITION>
+        <p>
+        A class that has at least one pure virtual method ("<code>= 0</code>")
+        is abstract, that is it cannot instantiated directly. It is used as a
+        base class for another class implementing that pure virtual method.
+        </p>
+        <p>
+        When all methods of a class are pure virtual it is considered a
+        <a HREF="#Interfaces">interface</a>.
+        </p>
+      </DEFINITION>
+    </BODY>
+  </STYLEPOINT>
+  
   <STYLEPOINT title="Interfaces">
     <SUMMARY>
       Classes that satisfy certain conditions are allowed, but not required, to
-      end with an <code>Interface</code> suffix.
+      start with an <code>I</code> prefix.
     </SUMMARY>
     <BODY>
       <DEFINITION>
@@ -993,7 +1006,7 @@ Tashana Landray
         </p>
       </DEFINITION>
       <PROS>
-        Tagging a class with the <code>Interface</code> suffix lets
+        Tagging a class with the <code>I</code> prefix lets
         others know that they must not add implemented methods or non
         static data members.  This is particularly important in the case of
         <A HREF="#Multiple_Inheritance">multiple inheritance</A>.
@@ -1001,16 +1014,13 @@ Tashana Landray
         Java programmers.
       </PROS>
       <CONS>
-        The <code>Interface</code> suffix lengthens the class name, which
-        can make it harder to read and understand.  Also, the interface
+        The interface
         property may be considered an implementation detail that shouldn't
         be exposed to clients.
       </CONS>
       <DECISION>
-        A class may end with <code>Interface</code> only if it meets the
-        above requirements.  We do not require the converse, however:
-        classes that meet the above requirements are not required to end
-        with <code>Interface</code>.
+        A class may start with <code>I</code> only if it meets the
+        above requirements.  We do not require the converse.
       </DECISION>
     </BODY>
   </STYLEPOINT>
@@ -1113,18 +1123,18 @@ Tashana Landray
       <BAD_CODE_SNIPPET>
         class Bar
         {
-          public:
+        public:
             int foo;
         }
       </BAD_CODE_SNIPPET>
       <CODE_SNIPPET>
         class Bar
         {
-          public:
+        public:
             int getFoo() const { return _foo; }
             void setFoo(const int value) { _foo = value; }
           
-          private:
+        private:
             int _foo;
         }
       </CODE_SNIPPET>
@@ -1739,9 +1749,10 @@ Tashana Landray
     <BODY>
       <p>
         The names of all types &#8212; classes, structs, typedefs, and enums
-        &#8212; have the same naming convention.  Type names should start
+        &#8212; have the same naming convention. Type names should start
         with a capital letter and have a capital letter for each new
-        word.  No underscores.  For example:
+        word. No underscores. This is the same convention as for
+        <a HREF="#File Names">file namea</a>. For example:
       </p>
       <CODE_SNIPPET>
         // classes and structs
@@ -1775,9 +1786,10 @@ Tashana Landray
           in classes have.
         </p>
         <CODE_SNIPPET>
-          struct UrlTableProperties {
-            string name;
-            int numEntries;
+          struct UrlTableProperties
+          {
+              string name;
+              int numEntries;
           }
         </CODE_SNIPPET>
         <p>
@@ -1819,14 +1831,15 @@ Tashana Landray
           <code>_numEntries</code>.
         </p>
         <CODE_SNIPPET>
-          class MyClass {
-           public:
-            ...
-            int getNumEntries() const { return _numEntries_; }
-            void setNumEntries(int numEntries) { _numEntries = numEntries; }
+          class MyClass
+          {
+          public:
+              ...
+              int getNumEntries() const { return _numEntries_; }
+              void setNumEntries(int numEntries) { _numEntries = numEntries; }
 
-           private:
-            int _numEntries;
+          private:
+              int _numEntries;
           };
         </CODE_SNIPPET>
         <!--
@@ -1868,10 +1881,11 @@ Tashana Landray
         <A HREF="#Macro_Names">macros</A>.
       </p>
       <CODE_SNIPPET>
-        enum UrlTableErrors {
-          OK = 0,
-          OUT_OF_MEMORY = 1,
-          MALFORMED_INPUT = 2
+        enum UrlTableErrors
+        {
+            OK = 0,
+            OUT_OF_MEMORY = 1,
+            MALFORMED_INPUT = 2
         };
       </CODE_SNIPPET>
     
@@ -1930,7 +1944,14 @@ Tashana Landray
 
   <STYLEPOINT title="Comment Style">
     <SUMMARY>
-      For comments inside the implementation use either the <code>//</code> or <code>/* */</code> syntax, as long as you are consistent. For header file comments use <a href="http://www.stack.nl/~dimitri/doxygen/" target="blank">Doxygen</a> <code>///</code> or <code>/** */</code> comments. Additional information like a brief description or function parameter description can be added inside Doxygen comments with backslashed or @-prefixed keywords like <code>/// \brief</code> or <code>/// @see</code>.
+      For comments inside the implementation use either the <code>//</code>
+      or <code>/* */</code> syntax, as long as you are consistent. For header
+      file comments use <a href="http://www.stack.nl/~dimitri/doxygen/" target="blank">Doxygen</a>
+      <code>///</code> or <code>/** */</code> comments. Doxygen allows to
+      automatically generating browsable source code documentation. Additional
+      information like a brief description or function parameter description
+      can be added inside Doxygen comments with backslashed or @-prefixed
+      keywords like <code>/// \brief</code> or <code>/// @see</code>.
     </SUMMARY>
     <BODY>
       <p>
@@ -1958,8 +1979,8 @@ Tashana Landray
             <li>a license boilerplate.  Choose the appropriate boilerplate
                 for the license used by the project (for example,
                 Apache 2.0, BSD, LGPL, GPL)</li>
-            <li>an author line to identify the original author of the
-                file</li>
+            <li>an author line with an ISO date (e.g. 2011-12-31) to identify
+                the original author of the file</li>
           </ul>
         </p>
         <p>
@@ -2192,10 +2213,11 @@ Tashana Landray
         <CODE_SNIPPET>
           // Divide result by two, taking into account that x
           // contains the carry from the add.
-          for (int i = 0; i &lt; result-&gt;size(); i++) {
-            x = (x &lt;&lt; 8) + (*result)[i];
-            (*result)[i] = x &gt;&gt; 1;
-            x &amp;= 1;
+          for (int i = 0; i &lt; result-&gt;size(); i++)
+          {
+              x = (x &lt;&lt; 8) + (*result)[i];
+              (*result)[i] = x &gt;&gt; 1;
+              x &amp;= 1;
           }
         </CODE_SNIPPET>
       </SUBSECTION>
@@ -2209,7 +2231,7 @@ Tashana Landray
           // If we have enough memory, mmap the data portion too.
           mmapBudget = max&lt;int64&gt;(0, mmapBudget - _index-&gt;length());
           if (mmapBudget &gt;= _dataSize &amp;&amp; !MmapData(mmapChunkBytes, mlock))
-            return;  // Error already logged.
+              return;  // Error already logged.
         </CODE_SNIPPET>
         <p>
           Note that there are both comments that describe what the
@@ -2224,9 +2246,9 @@ Tashana Landray
           doSomething();                  // Comment here so the comments line up.
           doSomethingElseThatIsLonger();  // Comment here so there are two spaces between
                                           // the code and the comment.
-          { // One space before comment when opening a new scope is allowed,
-            // thus the comment lines up with the following comments and code.
-            doSomethingElse();  // Two spaces before line comments normally.
+          {   // One space before comment when opening a new scope is allowed,
+              // thus the comment lines up with the following comments and code.
+              doSomethingElse();  // Two spaces before line comments normally.
           }
         </CODE_SNIPPET>
       </SUBSECTION>
@@ -2362,36 +2384,6 @@ Tashana Landray
       long.
     </SUMMARY>
     <BODY>
-      
-      <p>
-        We recognize that this rule is controversial, but so much existing
-        code already adheres to it, and we feel that consistency is
-        important.
-      </p>
-      <PROS>
-          Those who favor
-          
-          this rule argue
-          that it is rude to force them to resize their windows and there
-          is no need for anything longer.  Some folks are used to having
-          several code windows side-by-side, and thus don't have room to
-          widen their windows in any case.  People set up their work
-          environment assuming a particular maximum window width, and 80
-          columns has been the traditional standard.  Why change it?
-      </PROS>
-      <CONS>
-          Proponents of change argue that a wider line can make code
-          more readable.  The 80-column limit is an hidebound
-          throwback to 1960s mainframes;
-          
-          modern equipment has
-          wide screens that can easily show longer lines.
-      </CONS>
-      <DECISION>
-        <p>
-          100 characters should be the maximum.
-        </p>
-      </DECISION>
     </BODY>
   </STYLEPOINT>
 
@@ -2449,9 +2441,10 @@ Tashana Landray
         Functions look like this:
       </p>
       <CODE_SNIPPET>
-        ReturnType ClassName::functionName(Type parName1, Type parName2) {
-          doSomething();
-          ...
+        ReturnType ClassName::functionName(Type parName1, Type parName2)
+        {
+            doSomething();
+            ...
         }
       </CODE_SNIPPET>
       <p>
@@ -2459,9 +2452,10 @@ Tashana Landray
       </p>
       <CODE_SNIPPET>
         ReturnType ClassName::reallyLongFunctionName(Type parName1, Type parName2,
-                                                     Type parName3) {
-          doSomething();
-          ...
+                                                     Type parName3)
+        {
+            doSomething();
+            ...
         }
       </CODE_SNIPPET>
       <p>
@@ -2469,95 +2463,14 @@ Tashana Landray
       </p>
       <CODE_SNIPPET>
         ReturnType LongClassName::reallyReallyReallyLongFunctionName(
-            Type parName1,  // 4 space indent
+            Type parName1,  // 4 space / 1 tab indent
             Type parName2,
-            Type parName3) {
-          doSomething();  // 2 space indent
-          ...
+            Type parName3)
+        {
+            doSomething();  // 4 space / 1 tab indent
+            ...
         }
       </CODE_SNIPPET>
-      <p>
-        Some points to note:
-      </p>
-      <ul>
-        <li> The return type is always on the same line as the
-             function name.
-             </li>
-        <li> The open parenthesis is always on the same line as the
-             function name.
-             </li>
-        <li> There is never a space between the function name and the
-             open parenthesis.
-             </li>
-        <li> There is never a space between the parentheses and the
-             parameters.
-             </li>
-        <li> The open curly brace is always at the end of the same
-             line as the last parameter.
-             </li>
-        <li> The close curly brace is either on the last line by itself
-             or (if other style rules permit) on the same line as the
-             open curly brace.
-             </li>
-        <li> There should be a space between the close parenthesis and
-             the open curly brace.
-             </li>
-        <li> All parameters should be named, with identical names in the
-             declaration and implementation.
-             </li>
-        <li> All parameters should be aligned if possible.
-             </li>
-        <li> Default indentation is 2 spaces.
-             </li>
-        <li> Wrapped parameters have a 4 space indent.
-             </li>
-      </ul>
-      <p>
-        If your function is <code>const</code>, the <code>const</code>
-        keyword should be on the same line as the last parameter:
-      </p>
-      <CODE_SNIPPET>
-        // Everything in this function signature fits on a single line
-        ReturnType functionName(Type par) const
-        {
-          ...
-        }
-
-        // This function signature requires multiple lines, but
-        // the const keyword is on the line with the last parameter.
-        ReturnType reallyLongFunctionName(Type par1,
-                                          Type par2) const
-        {
-          ...
-        }
-      </CODE_SNIPPET>
-      <p>
-        If some parameters are unused, comment out the variable name in the
-        function definition:
-      </p>
-      <CODE_SNIPPET>
-        // Always have named parameters in interfaces.
-        class Shape
-        {
-         public:
-          virtual void rotate(double radians) = 0;
-        }
-
-        // Always have named parameters in the declaration.
-        class Circle : public Shape
-        {
-         public:
-          virtual void rotate(double radians);
-        }
-
-        // Comment out unused named parameters in definitions.
-        void Circle::rotate(double /*radians*/) {}
-      </CODE_SNIPPET>
-      <BAD_CODE_SNIPPET>
-        // Bad - if someone wants to implement later, it's not clear what the
-        // variable means.
-        void Circle::rotate(double) {}
-      </BAD_CODE_SNIPPET>
     </BODY>
   </STYLEPOINT>
 
@@ -2574,23 +2487,25 @@ Tashana Landray
       </p>
       <CODE_SNIPPET>
         // Good - directives at beginning of line
-          if (lopsidedScore) {
+          if (lopsidedScore)
+          {
         #if DISASTER_PENDING      // Correct -- Starts at beginning of line
-            dropEverything();
+              dropEverything();
         # if NOTIFY               // OK but not required -- Spaces after #
-            notifyClient();
+              notifyClient();
         # endif
         #endif
-            backToNormal();
+              backToNormal();
           }
       </CODE_SNIPPET>
       <BAD_CODE_SNIPPET>
         // Bad - indented directives
-          if (lopsidedScore) {
-            #if DISASTER_PENDING  // Wrong!  The "#if" should be at beginning of line
-            dropEverything();
-            #endif                // Wrong!  Do not indent "#endif"
-            backToNormal();
+          if (lopsidedScore)
+          {
+              #if DISASTER_PENDING  // Wrong!  The "#if" should be at beginning of line
+              dropEverything();
+              #endif                // Wrong!  Do not indent "#endif"
+              backToNormal();
           }
       </BAD_CODE_SNIPPET>
     </BODY>
@@ -2611,23 +2526,22 @@ Tashana Landray
         class MyClass : public OtherClass
         {
         public:
-          MyClass();  // Regular 2 space indent.
-          explicit MyClass(int var);
-          ~MyClass() {}
+            MyClass();  // Regular 4 space / 1 tab indent.
+            explicit MyClass(int var);
+            ~MyClass() {}
 
-          void someFunction();
-          void someFunctionThatDoesNothing() {
-          }
+            void someFunction();
+            void someFunctionThatDoesNothing() {}
 
-          void setSomeVar(int var) { _someVar = var; }
-          int getSomeVar() const { return _someVar; }
+            void setSomeVar(int var) { _someVar = var; }
+            int getSomeVar() const { return _someVar; }
 
-         private:
-          bool someInternalFunction();
+        private:
+            bool someInternalFunction();
 
-          int _someVar;
-          int _someOtherVar;
-          DISALLOW_COPY_AND_ASSIGN(MyClass);
+            int _someVar;
+            int _someOtherVar;
+            DISALLOW_COPY_AND_ASSIGN(MyClass);
         };
       </CODE_SNIPPET>
       <p>
@@ -2682,9 +2596,9 @@ Tashana Landray
         : some_var_(var),
           some_other_var_(var + 1) // lined up
         {
-          ...
-          doSomething();
-          ...
+            ...
+            doSomething();
+            ...
         }
       </CODE_SNIPPET>
     </BODY>
@@ -2702,8 +2616,9 @@ Tashana Landray
       <CODE_SNIPPET>
         namespace {
 
-        void foo() {  // Correct.  No extra indentation within namespace.
-          ...
+        void foo()  // Correct.  No extra indentation within namespace.
+        {
+            ...
         }
 
         }  // namespace
@@ -2712,12 +2627,14 @@ Tashana Landray
         Do not indent within a namespace:
       </p>
       <BAD_CODE_SNIPPET>
-        namespace {
+        namespace
+        {
 
-          // Wrong.  Indented when it should not be.
-          void foo() {
-            ...
-          }
+            // Wrong.  Indented when it should not be.
+            void foo()
+            {
+                ...
+            }
 
         }  // namespace
       </BAD_CODE_SNIPPET>
@@ -2745,13 +2662,14 @@ Tashana Landray
         int x[] = { 0 };  // Spaces inside braces for array initialization are
         int x[] = {0};    // optional.  If you use them, put them on both sides!
         // Spaces around the colon in inheritance and initializer lists.
-        class Foo : public Bar {
-         public:
-          // For inline function implementations, put spaces between the braces
-          // and the implementation itself.
-          Foo(int b) : Bar(), _baz(b) {}  // No spaces inside empty braces.
-          void reset() { _baz = 0; }  // Spaces separating braces from implementation.
-          ...
+        class Foo : public Bar
+        {
+        public:
+            // For inline function implementations, put spaces between the braces
+            // and the implementation itself.
+            Foo(int b) : Bar(), _baz(b) {}  // No spaces inside empty braces.
+            void reset() { _baz = 0; }  // Spaces separating braces from implementation.
+            ...
         </CODE_SNIPPET>
         <p>
           Adding trailing whitespace can cause extra work for others editing
@@ -2773,13 +2691,13 @@ Tashana Landray
         if ( test )     // parentheses, but this is rare.  Be consistent.
         for ( int i = 0; i &lt; 5; ++i )
         for ( ; i &lt; 5 ; ++i)  // For loops always have a space after the
-          ...                    // semicolon, and may have a space before the
+            ...                  // semicolon, and may have a space before the
                                  // semicolon.
         switch (i)
         {
-          case 1:         // No space before colon in a switch case.
-            ...
-          case 2: break;  // Use a space after a colon if there's code after it.
+            case 1:         // No space before colon in a switch case.
+                ...
+            case 2: break;  // Use a space after a colon if there's code after it.
         </CODE_SNIPPET>
       </SUBSECTION>
       <SUBSECTION title="Operators">
@@ -2789,7 +2707,7 @@ Tashana Landray
         x = -5;             // No spaces separating unary operators and their
         ++x;                // arguments.
         if (x &amp;&amp; !y)
-          ...
+            ...
         v = w * x + y / z;  // Binary operators usually have spaces around them,
         v = w*x + y/z;      // but it's okay to remove spaces around factors.
         v = w * (x + z);    // Parentheses should have no spaces inside them.
