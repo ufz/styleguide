@@ -103,6 +103,18 @@ Tashana Landray
   </p>
   
 </CATEGORY>
+
+<CATEGORY title="Automatic code styling">
+  <p>
+  This guide comes with a <a HREF="http://ufz.github.com/styleguide/uncrustify.cfg">
+  configuration file</a> for the <a HREF="http://uncrustify.sourceforge.net/">
+  uncrustify</a> automatic code styler. With this tool you can restyle your source
+  code according to this styleguide. The config file is not finished yet. For
+  creating the config file the <a HREF="http://universalindent.sourceforge.net/">
+  UniversalIndentGUI</a> was used.
+  </p>
+</CATEGORY>
+
 </OVERVIEW>
 
 <CATEGORY title="Header Files">
