@@ -9,8 +9,8 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
 <CATEGORY title="Most important rules to remember">
 
   <ul>
-  <li><strong>Never</strong> use global variables. <a name="Global_variables">More&#8230;</a></li>
-  <li>Give <strong>descriptive names</strong> to functions, variables, and file names; eschew abbreviation. <a name="Naming">More&#8230;</a>
+  <li><strong>Never</strong> use global variables. <a href="#Global_variables">More&#8230;</a></li>
+  <li>Give <strong>descriptive names</strong> to functions, variables, and file names; eschew abbreviation. <a href="#Naming">More&#8230;</a>
   
   <ul>
   <li>Variable names start lowercase and then camel case. Class member
@@ -18,8 +18,8 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
   <li>Regular functions or class methods start lowercase an then camel case.</li>
   </ul></li>
   <li>Define only <strong>one class per header file</strong>. The file name must match the
-  class that is defined in the file. <a href="Header_Files">More&#8230;</a></li>
-  <li><strong>Document</strong> your code. <a href="Comments">More&#8230;</a></li>
+  class that is defined in the file. <a href="#Header_Files">More&#8230;</a></li>
+  <li><strong>Document</strong> your code. <a href="#Comments">More&#8230;</a></li>
   </ul>
 
 </CATEGORY>
