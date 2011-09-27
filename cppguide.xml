@@ -23,15 +23,6 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
        </p>
      </BODY>
   </STYLEPOINT>
-  	<DIV style=" font-size: larger; margin-left: +2em;">
-      <SPAN class="showhide_button" style="font-size: 180%; float: none">
-        <xsl:attribute name="onclick"><xsl:value-of select="'javascript:ShowHideAll()'"/></xsl:attribute>
-        <xsl:attribute name="name"><xsl:value-of select="$show_hide_all_button"/></xsl:attribute>
-        <xsl:attribute name="id"><xsl:value-of select="$show_hide_all_button"/></xsl:attribute>
-        <xsl:value-of select="$button_text"/>
-      </SPAN>
-      With this button you can toggle all summaries!
-    </DIV>
 </CATEGORY>
 
 <CATEGORY title="Automatic code styling">
