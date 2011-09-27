@@ -6,6 +6,24 @@
 This styleguide is derived from the <a href="http://code.google.com/p/google-styleguide/">Google C++ Style Guide</a> and is hosted on <a href="https://github.com/ufz/styleguide">Github</a>. Some <a href="https://github.com/ufz/styleguide/compare/9df0dce4fa1441f9de7ff99760c61e01b6d3b79c...gh-pages">modifications</a> were made to match the <a href="http://www.opengeosys.net" target="blank">OpenGeoSys</a> development needs. The original authors are Benjy Weinberger, Craig Silverstein, Gregory Eitzmann,	Mark Mentovai and Tashana Landray.
 </p>
 
+<CATEGORY title="Most important rules to remember">
+
+  <ul>
+  <li><strong>Never</strong> use global variables. <a name="Global_variables">More&#8230;</a></li>
+  <li>Give <strong>descriptive names</strong> to functions, variables, and file names; eschew abbreviation. <a name="Naming">More&#8230;</a>
+  
+  <ul>
+  <li>Variable names start lowercase and then camel case. Class member
+  variables start with an underscore.</li>
+  <li>Regular functions or class methods start lowercase an then camel case.</li>
+  </ul></li>
+  <li>Define only <strong>one class per header file</strong>. The file name must match the
+  class that is defined in the file. <a href="Header_Files">More&#8230;</a></li>
+  <li><strong>Document</strong> your code. <a href="Comments">More&#8230;</a></li>
+  </ul>
+
+</CATEGORY>
+
 <OVERVIEW>
 <CATEGORY title="Important Note">
   <STYLEPOINT title="Displaying Hidden Details in this Guide">
