@@ -138,24 +138,6 @@ xmlns:fn="http://www.w3.org/2005/xpath-functions">
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <DIV style="margin-left: 50%; font-size: 75%;">
-      <P>
-        Each style point has a summary for which additional information is available
-        by toggling the accompanying arrow button that looks this way:
-        <SPAN class="showhide_button" style="margin-left: 0; float: none">
-          <xsl:value-of select="$show_button_text"/></SPAN>.
-        You may toggle all summaries with the big arrow button:
-      </P>
-      <DIV style=" font-size: larger; margin-left: +2em;">
-        <SPAN class="showhide_button" style="font-size: 180%; float: none">
-          <xsl:attribute name="onclick"><xsl:value-of select="'javascript:ShowHideAll()'"/></xsl:attribute>
-          <xsl:attribute name="name"><xsl:value-of select="$show_hide_all_button"/></xsl:attribute>
-          <xsl:attribute name="id"><xsl:value-of select="$show_hide_all_button"/></xsl:attribute>
-          <xsl:value-of select="$button_text"/>
-        </SPAN>
-        Toggle all summaries
-      </DIV>
-    </DIV>
     <xsl:call-template name="TOC">
       <xsl:with-param name="root" select=".."/>
     </xsl:call-template>
