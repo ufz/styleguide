@@ -50,7 +50,9 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
   uncrustify</a> automatic code styler. With this tool you can restyle your source
   code according to this styleguide. The config file is not finished yet. For
   creating the config file the <a HREF="http://universalindent.sourceforge.net/">
-  UniversalIndentGUI</a> was used.
+  UniversalIndentGUI</a> was used. See
+  <a HREF="https://github.com/ufz/styleguide/blob/gh-pages/README.md">this link</a>
+  for instructions how to apply the formatting to your code.
   </p>
 </CATEGORY>
 
