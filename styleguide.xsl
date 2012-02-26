@@ -123,6 +123,22 @@ xmlns:fn="http://www.w3.org/2005/xpath-functions">
           <BODY>
             <H1><xsl:value-of select="@title"/></H1>
               <xsl:apply-templates/>
+
+            <!-- gaug.es -->
+            <script type="text/javascript">
+						  var _gauges = _gauges || [];
+						  (function() {
+						    var t   = document.createElement('script');
+						    t.type  = 'text/javascript';
+						    t.async = true;
+						    t.id    = 'gauges-tracker';
+						    t.setAttribute('data-site-id', '4f4a1520f5a1f50999000004');
+						    t.src = '//secure.gaug.es/track.js';
+						    var s = document.getElementsByTagName('script')[0];
+						    s.parentNode.insertBefore(t, s);
+						  })();
+						</script>
+
           </BODY>
       </HTML>
   </xsl:template>
