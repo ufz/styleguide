@@ -11,7 +11,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
   <ul>
   <li><strong>Never</strong> use global variables. <a href="#Global_variables">More&#8230;</a></li>
   <li>Give <strong>descriptive names</strong> to functions, variables, and file names; eschew abbreviation. <a href="#Naming">More&#8230;</a>
-  
+
   <ul>
   <li>Variable names start lowercase and then camel case. Class member
   variables start with an underscore.</li>
@@ -82,7 +82,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
       <code><i>&lt;FILENAME_WITHOUT_ENDING&gt;</i>_H</code>.
     </SUMMARY>
     <BODY>
-      
+
       <p>
         Every file in a project should be named unique so it is
         sufficient to only use the filename. For example, the file
@@ -97,7 +97,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
 
          #endif  // FOO_H
       </CODE_SNIPPET>
-      
+
     </BODY>
   </STYLEPOINT>
 
@@ -151,7 +151,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
              exception is if an argument <code>Foo</code>
              or <code>const Foo&amp;</code> has a
              non-<code>explicit</code>, one-argument constructor,
-             
+
              in which case we need the full definition to support
              automatic type conversion.)
              </li>
@@ -170,7 +170,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
         definitions of the classes they use, and usually have to
         include several header files.
       </p>
-      
+
       <SUBSECTION title="Note:">
         If you use a symbol <code>Foo</code> in your source file, you
         should bring in a definition for <code>Foo</code> yourself,
@@ -273,10 +273,10 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
     </SUMMARY>
     <BODY>
       <p>
-        
+
         All of a project's header files should be
         listed as only the filename itself.
-        
+
         <code>Logging.h</code>
         should be included as
       </p>
@@ -292,7 +292,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
         <li> C system files.</li>
         <li> C++ system files.</li>
         <li> Other libraries' <code>.h</code> files.</li>
-        <li> 
+        <li>
              Your project's
              <code>.h</code> files.</li>
       </ol>
@@ -301,16 +301,16 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
         every header file to be compilable on its own.  The easiest
         way to achieve this is to make sure that every one of them is
         the first <code>.h</code> file <code>#include</code>d in some
-        <code>.cpp</code>.  
+        <code>.cpp</code>.
       </p>
-      
+
       <p>
         Within each section it is nice to order the includes
         alphabetically.
       </p>
       <p>
         For example, the includes in
-        
+
         <code>Fooserver.cpp</code>
         might look like this:
       </p>
@@ -362,7 +362,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
           </p>
           <ul>
             <li> Namespaces wrap the entire source file after includes,
-                 
+
                  <a href="http://google-gflags.googlecode.com/">gflags</a>
                  definitions/declarations, and forward declarations of classes
                  from other namespaces:
@@ -397,7 +397,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
                  </CODE_SNIPPET>
                  </li>
 
-            
+
 
             <li> Do not declare anything in namespace
                  <code>std</code>, not even forward declarations of
@@ -417,7 +417,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
                  </CODE_SNIPPET>
                  </li>
           </ul>
-        </SUBSECTION>        
+        </SUBSECTION>
       </DECISION>
     </BODY>
   </STYLEPOINT>
@@ -518,7 +518,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
       </CODE_SNIPPET>
     </BODY>
   </STYLEPOINT>
-  
+
   <STYLEPOINT title="Global variables">
     <SUMMARY>
       NEVER use global variables! Period.
@@ -564,14 +564,14 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
         rule completely disallows <code>vector</code> (use C arrays instead), or
         <code>string</code> (use <code>const char []</code>).
       </p>
-      
+
       <p>
         If you need a static variable of a class type, consider
         initializing a pointer (which will never be freed), from either your
         main() function or from pthread_once().
       </p>
-      
-      
+
+
     </BODY>
   </STYLEPOINT>
 </CATEGORY>
@@ -618,7 +618,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
                constructor code will be called before
                <code>main()</code>, possibly breaking some implicit
                assumptions in the constructor code.  For instance,
-               
+
                <a href="http://google-gflags.googlecode.com/">gflags</a>
                will not yet have been initialized.
                </li>
@@ -671,7 +671,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
           If your class inherits from an existing class but you add no
           new member variables, you are not required to have a default
           constructor.
-          
+
         </p>
       </DECISION>
     </BODY>
@@ -724,12 +724,12 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
         <p>
           If your class does not need a copy constructor or assignment
           operator, you must explicitly disable them.
-          
-          
+
+
           To do so, add dummy declarations for the copy constructor and
           assignment operator in the <code>private:</code> section of your
           class, but do not provide any corresponding definition (so that
-          any attempt to use them results in a link error). 
+          any attempt to use them results in a link error).
         </p>
         <p>
           For convenience, a <code>DISALLOW_COPY_AND_ASSIGN</code> macro
@@ -758,7 +758,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
         </CODE_SNIPPET>
         <p>
         </p>
-        
+
       </DECISION>
     </BODY>
   </STYLEPOINT>
@@ -848,7 +848,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
         <p>
           Make your destructor <code>virtual</code> if necessary. If
           your class has virtual methods, its destructor
-          
+
           should be virtual.
         </p>
         <p>
@@ -923,7 +923,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
       </DEFINITION>
     </BODY>
   </STYLEPOINT>
-  
+
   <STYLEPOINT title="Interfaces">
     <SUMMARY>
       Classes that satisfy certain conditions are allowed, but not required, to
@@ -1086,7 +1086,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
         public:
             int getFoo() const { return _foo; }
             void setFoo(const int value) { _foo = value; }
-          
+
         private:
             int _foo;
         }
@@ -1162,7 +1162,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
       <p>
         You could find long and complicated functions when working
         with
-        
+
         some
         code.  Do not be intimidated by modifying existing
         code: if working with such a function proves to be difficult,
@@ -1176,17 +1176,17 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
 
 <!--
 <CATEGORY title="Google-Specific Magic">
-  
+
   <p>
     There are various tricks and utilities that we use to make C++
     code more robust, and various ways we use C++ that may differ from
     what you see elsewhere.
   </p>
 
-  
+
 
   <STYLEPOINT title="Smart Pointers">
-    
+
     <SUMMARY>
       If you actually need pointer semantics, <code>scoped_ptr</code>
       is great.  You should only use <code>std::tr1::shared_ptr</code>
@@ -1197,7 +1197,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
     <BODY>
       <DEFINITION>
         "Smart" pointers are objects that act like pointers, but automate
-        management of the underlying memory. 
+        management of the underlying memory.
       </DEFINITION>
       <PROS>
         Smart pointers are extremely useful for preventing memory leaks, and
@@ -1226,7 +1226,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
           Safe with const referents (i.e. <code>shared_ptr&lt;const
           T&gt;</code>). Reference-counted pointers with non-const referents
           can occasionally be the best design, but try to rewrite with single
-          owners where possible. 
+          owners where possible.
           </dd>
         </dl>
       </DECISION>
@@ -1248,7 +1248,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
         positives can be ignored by putting <code>// NOLINT</code> at
         the end of the line.
       </p>
-      
+
       <p>
         Some projects have instructions on how to run <code>cpplint.py</code>
         from their project tools. If the project you are contributing to does
@@ -1257,7 +1257,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
     </BODY>
   </STYLEPOINT>
 
-  
+
 </CATEGORY>
 -->
 
@@ -1336,10 +1336,10 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
         <p>
           Do not use C-style casts.  Instead, use these C++-style
           casts.
-          
+
         </p>
         <ul>
-          
+
           <li> Use <code>static_cast</code> as the equivalent of a
                C-style cast that does value conversion, or when you need to explicitly up-cast
                a pointer from a class to its superclass.
@@ -1347,13 +1347,13 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
           <li> Use <code>const_cast</code> to remove the <code>const</code>
                qualifier (see <a HREF="#Use_of_const">const</a>).
                </li>
-          
-          
+
+
           <li> Use <code>reinterpret_cast</code> to do unsafe
                conversions of pointer types to and from integer and
                other pointer types. Use this only if you know what you are
                doing and you understand the aliasing issues.
-               
+
                </li>
           <li> Do not use <code>dynamic_cast</code> except in test code.
                If you need to know type information at runtime in this way
@@ -1453,7 +1453,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
           describing.  However, this consistency argument doesn't
           apply in this case, because the "don't go crazy" dictum
           eliminates most of the uses you'd have to be consistent with.
-          
+
           Putting the <code>const</code> first is arguably more readable,
           since it follows English in putting the "adjective"
           (<code>const</code>) before the "noun" (<code>int</code>).
@@ -1583,11 +1583,11 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
     constant, a macro, etc., without requiring us to search for the
     declaration of that entity. The pattern-matching engine in our
     brains relies a great deal on these naming rules.
-    
+
   </p>
   <p>
     Naming rules are pretty arbitrary, but
-    
+
     we feel that consistency is more important than individual preferences
     in this area, so regardless of whether you find them sensible or not,
     the rules are the rules.
@@ -1729,7 +1729,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
       instance: <code>myExcitingLocalVariable</code>,
       <code>_myExcitingMemberVariable</code>. As an alternative you can use
       lowercase names with underscores: <code>_my_exciting_member_variable</code>.
-      But be consistent in a file!  
+      But be consistent in a file!
     </SUMMARY>
     <BODY>
       <SUBSECTION title="Struct Variables">
@@ -1808,7 +1808,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
   </STYLEPOINT>
 
   <STYLEPOINT title="Namespace Names">
-    
+
     <SUMMARY>
       Namespaces names are named like <A HRED="#Type_Names">types</A>.
       They start with a capital letter and have a capital letter for
@@ -1841,7 +1841,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
             MALFORMED_INPUT = 2
         };
       </CODE_SNIPPET>
-    
+
     </BODY>
   </STYLEPOINT>
 
@@ -1887,13 +1887,13 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
   </p>
   <p>
     When writing your comments, write for your audience: the next
-    
+
     contributor
     who will need to understand your code.  Be generous &#8212; the next
     one may be you!
   </p>
 
-  
+
 
   <STYLEPOINT title="Comment Style">
     <SUMMARY>
@@ -1917,21 +1917,19 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
 
   <STYLEPOINT title="File Comments">
     <SUMMARY>
-      Start each file with a copyright notice, followed by a
+      Start each file with the copyright and license notice, followed by a
       description of the contents of the file.
     </SUMMARY>
     <BODY>
       <SUBSECTION title="Legal Notice and Author Line">
-        
-        
+
+
         <p>
           Every file should contain the following items, in order:
           <ul>
-            <li>a copyright statement (for example,
-                <code>Copyright 2008 Google Inc.</code>)</li>
-            <li>a license boilerplate.  Choose the appropriate boilerplate
-                for the license used by the project (for example,
-                Apache 2.0, BSD, LGPL, GPL)</li>
+            <li>the copyright statement:
+                <code>Copyright (c) 2012, OpenGeoSys Community (http://www.opengeosys.net)</code>)</li>
+            <li>the statement where to find the OGS license</li>
             <li>an author line with an ISO date (e.g. 2011-12-31) to identify
                 the original author of the file</li>
           </ul>
@@ -1939,20 +1937,23 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
         <p>
           If you make significant changes to a file that someone else
           originally wrote, add yourself to the author line. This can
-          be very helpful when another
-          
-          contributor
-          has questions about the file and needs to know whom to contact
-          about it.
+          be very helpful when another contributor has questions about
+          the file and needs to know whom to contact about it.
         </p>
-        
+
         <CODE_SNIPPET>
           /**
+           * Copyright (c) 2012, OpenGeoSys Community (http://www.opengeosys.net)
+           *            Distributed under a Modified BSD License.
+           *              See accompanying file LICENSE.txt or
+           *              http://www.opengeosys.net/LICENSE.txt
+           *
+           *
            * \file MyHeaderFile.h
            * A brief description of this file.
-           * A more elaborate file description (optinal).
+           * A more elaborate file description (optional).
            *
-           * 2011-03-04 LB Initial definition
+           * Created on 2011-03-04 by [FirstName LastName]
            */
         </CODE_SNIPPET>
       </SUBSECTION>
@@ -2067,9 +2068,9 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
            *  responsibility to delete the iterator when it is done with it,
            *  and it must not use the iterator once the GargantuanTable object
            *  on which the iterator was created has been deleted.
-           *  
+           *
            *  The iterator is initially positioned at the beginning of the table.
-           *  
+           *
            *  This method is equivalent to:
            *  \code
            *     Iterator* iter = table-&gt;NewIterator();
@@ -2279,7 +2280,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
       <p>
         <code>TODO</code>s should include the string <code>TODO</code> in
         all caps, followed by the
-        
+
         name, e-mail address, or other
         identifier
         of the person who can best provide context about the problem
@@ -2289,11 +2290,11 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
         A <code>TODO</code> is not a commitment that the person referenced
         will fix the problem.  Thus when you create a <code>TODO</code>, it is
         almost always your
-        
+
         name
         that is given.
       </p>
-      
+
       <CODE_SNIPPET>
         // TODO(kl@gmail.com): Use a "*" here for concatenation operator.
         // TODO(Zeke) change this to use relations.
@@ -2312,15 +2313,15 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
 <CATEGORY title="Formatting">
   <p>
     Coding style and formatting are pretty arbitrary, but a
-    
+
     project
     is much easier to follow if everyone uses the same style. Individuals
     may not agree with every aspect of the formatting rules, and some of
     the rules may take some getting used to, but it is important that all
-    
+
     project contributors
     follow the style rules so that
-    
+
     they
     can all read and understand everyone's code easily.
   </p>
@@ -2348,7 +2349,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
     <BODY>
     </BODY>
   </STYLEPOINT>
-  
+
   <STYLEPOINT title="Indenting">
     <SUMMARY>
       Use <a href="http://en.wikipedia.org/wiki/Indent_style#Allman_style">Allman style</a>
@@ -2630,7 +2631,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
           whitespace.  So:  Don't introduce trailing whitespace.  Remove it
           if you're already changing that line, or do it in a separate
           clean-up
-          
+
           operation (preferably when no-one else
           is working on the file).
         </p>
@@ -2725,7 +2726,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
     discuss here.
   </p>
 
-  
+
 
   <STYLEPOINT title="Existing Non-conformant Code">
     <SUMMARY>
@@ -2745,11 +2746,11 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
     </BODY>
   </STYLEPOINT>
 
-  
+
   <!--
   <STYLEPOINT title="Windows Code">
     <SUMMARY>
-      
+
       Windows programmers have developed their own set of coding
       conventions, mainly derived from the conventions in Windows headers
       and other Microsoft code.  We want to make it easy for anyone to
@@ -2830,7 +2831,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
   </STYLEPOINT>
   -->
 
-  
+
 </CATEGORY>
 
 <PARTING_WORDS>
@@ -2854,7 +2855,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
     the discontinuity throws readers out of their rhythm when they
     go to read it. Try to avoid this.
   </p>
-  
+
   <p>
     OK, enough writing about writing code; the code itself is much
     more interesting. Have fun!
@@ -2883,7 +2884,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
   <p>
     One way in which we keep the code base manageable is by enforcing
     <em>consistency</em>.
-    
+
     It is very important that any programmer be able to look at another's
     code and quickly understand it. Maintaining a uniform style and following
     conventions means that we can more easily use "pattern-matching" to infer
@@ -2904,7 +2905,7 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
   <p>
     Note that this guide is not a C++ tutorial: we assume that the
     reader is familiar with the language.
-  </p> 
+  </p>
 </CATEGORY>
 
 </GUIDE>
