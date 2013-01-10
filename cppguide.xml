@@ -1928,10 +1928,9 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
           Every file should contain the following items, in order:
           <ul>
             <li>the copyright statement:
-                <code>Copyright (c) 2012, OpenGeoSys Community (http://www.opengeosys.net)</code>)</li>
+                <code>Copyright (c) 2013, OpenGeoSys Community (http://www.opengeosys.net)</code>)</li>
             <li>the statement where to find the OGS license</li>
-            <li>an author line with an ISO date (e.g. 2011-12-31) to identify
-                the original author of the file</li>
+            <li>the author and an ISO date of the file creation (e.g. 2011-12-31)</li>
           </ul>
         </p>
         <p>
@@ -1943,26 +1942,22 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
 
         <CODE_SNIPPET>
           /**
-           * Copyright (c) 2012, OpenGeoSys Community (http://www.opengeosys.net)
+           * \file
+           * \author [FirstName] [LastName]
+           * \date   [FileCreationDate]
+           * \brief  A brief description of this file.
+           *
+           * \copyright
+           * Copyright (c) 2013, OpenGeoSys Community (http://www.opengeosys.org)
            *            Distributed under a Modified BSD License.
            *              See accompanying file LICENSE.txt or
-           *              http://www.opengeosys.net/LICENSE.txt
+           *              http://www.opengeosys.org/project/license
            *
-           *
-           * \file MyHeaderFile.h
-           * A brief description of this file.
-           * A more elaborate file description (optional).
-           *
-           * Created on 2011-03-04 by [FirstName LastName]
            */
         </CODE_SNIPPET>
       </SUBSECTION>
 
       <SUBSECTION title="File Contents">
-        <p>
-          Every file should have a comment at the top, below the copyright
-          notice and author line, that describes the contents of the file.
-        </p>
         <p>
           Generally a <code>.h</code> file will describe the classes
           that are declared in the file with an overview of what they
