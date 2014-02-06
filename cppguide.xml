@@ -676,6 +676,57 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
       </DECISION>
     </BODY>
   </STYLEPOINT>
+  
+  <STYLEPOINT title="Explicit Constructors">
+    <SUMMARY>
+      Use the C++ keyword <code>explicit</code> for constructors with
+      one argument.
+    </SUMMARY>
+    <BODY>
+      <DEFINITION>
+        Normally, if a constructor takes one argument, it can be used
+        as a conversion.  For instance, if you define
+        <code>Foo::Foo(string name)</code> and then pass a string to a
+        function that expects a <code>Foo</code>, the constructor will
+        be called to convert the string into a <code>Foo</code> and
+        will pass the <code>Foo</code> to your function for you.  This
+        can be convenient but is also a source of trouble when things
+        get converted and new objects created without you meaning them
+        to.  Declaring a constructor <code>explicit</code> prevents it
+        from being invoked implicitly as a conversion.
+      </DEFINITION>
+      <PROS>
+        Avoids undesirable conversions.
+      </PROS>
+      <CONS>
+        None.
+      </CONS>
+      <DECISION>
+        <p>
+          We require all single argument constructors to be
+          explicit. Always put <code>explicit</code> in front of
+          one-argument constructors in the class definition:
+          <code>explicit Foo(string name);</code>
+        </p>
+        <p>
+          The exception is copy constructors, which, in the rare
+          cases when we allow them, should probably not be
+          <code>explicit</code>.
+          
+          Classes that are intended to be
+          transparent wrappers around other classes are also
+          exceptions.
+          Such exceptions should be clearly marked with comments.
+        </p>
+        <p>
+          Finally, constructors that take only an initializer_list may be
+          non-explicit. This is to permit construction of your type using the
+          assigment form for brace init lists (i.e. <code>MyType m = {1, 2}
+          </code>).
+        </p>
+      </DECISION>
+    </BODY>
+  </STYLEPOINT>
 
   <STYLEPOINT title="Copy Constructors">
     <SUMMARY>
