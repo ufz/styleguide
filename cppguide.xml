@@ -1745,12 +1745,12 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
   </STYLEPOINT>
   
   <STYLEPOINT title="Template File Names">
-    <SUMMARY>
+    <p>
       In addition to the general naming scheme the template implementation
       should be placed in a file named <code>MyTemplateClass-impl.h</code>.
       This file gets included at the end of the header file
       <code>MyTemplateClass.h</code>.
-    </SUMMARY>
+    </p>
   </STYLEPOINT>
 
   <STYLEPOINT title="Type Names">
