@@ -1346,21 +1346,6 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
     </BODY>
   </STYLEPOINT>
 
-  <STYLEPOINT title="Run-Time Type Information (RTTI)">
-    <SUMMARY>
-      We do not use Run Time Type Information (RTTI).
-    </SUMMARY>
-    <BODY>
-      <DEFINITION>
-        RTTI allows a programmer to query the C++ class of an
-        object at run time.
-      </DEFINITION>
-      <DECISION>
-        <p>Qt and VTK have built in functionality for that.</p>
-      </DECISION>
-    </BODY>
-  </STYLEPOINT>
-
   <STYLEPOINT title="Casting">
     <SUMMARY>
       Use C++ casts like <code>static_cast&lt;&gt;()</code>.  Do not use
@@ -1405,11 +1390,6 @@ This styleguide is derived from the <a href="http://code.google.com/p/google-sty
                other pointer types. Use this only if you know what you are
                doing and you understand the aliasing issues.
 
-               </li>
-          <li> Do not use <code>dynamic_cast</code> except in test code.
-               If you need to know type information at runtime in this way
-               outside of a unittest, you probably have a <A HREF="#Run-Time_Type_Information__RTTI_">design
-               flaw</A>.
                </li>
         </ul>
       </DECISION>
